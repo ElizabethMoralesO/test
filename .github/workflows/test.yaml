@@ -13,25 +13,25 @@ on:
         - prod
 jobs:
   my-job:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     environment: ${{ inputs.Environment }} # Set the environment variable
     steps:
       - uses: actions/checkout@v3
 
       - name: Verify file existence
         run: |
-          ls ./.github/variables.yml
+          cat ./.github/variables.yml
       - name: Load variables
         env:
           ENV: ${{ inputs.Environment }}
           VAR1_FILE: ./.github/variables.yml
         run: |
           echo "Loading variables from $VAR1_FILE"
-          yq -r '.environments[] | select(.name == $ENV) | .vars' $VAR1_FILE
+          $vars = (Get-Content -Path $VAR1_FILE -Raw | ConvertFrom-Json).environments | Where-Object {$_.name -eq $ENV} | Select-Object -ExpandProperty vars
           echo "Environment variables:"
-          printenv
-          echo "$vars" >> $GITHUB_ENV
-          cat $GITHUB_ENV
+          $vars | ForEach-Object { $_ } | ForEach-Object { echo " $_" }
+          $vars | ForEach-Object { $_ } | Add-Content -Path $GITHUB_ENV
+          Get-Content -Path $GITHUB_ENV
 
       - name: Print variables
         run: |
