@@ -36,5 +36,5 @@ jobs:
           Get-Content -Path $env:GITHUB_ENV
       - name: Print variables
         run: |
-          echo "VAR1: $VAR1"
-          echo "VAR2: $VAR2"
+          echo "VAR1: $env:VAR1"
+          echo "VAR2: $env:VAR2"
