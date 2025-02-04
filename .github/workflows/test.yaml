@@ -1,0 +1,29 @@
+name: My Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      Environment:
+        description: Environment to provision infra
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - prod
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.Environment }} # Set the environment variable
+    steps:
+      - name: Load variables
+        run: |
+          echo "::set-env name=VAR1::${{ env.ENV }}_VAR1"
+          echo "::set-env name=VAR2::${{ env.ENV }}_VAR2"
+        env:
+          ENV: ${{ inputs.Environment }}
+          VAR1_FILE: .github/variables.yml
+      - name: Print variables
+        run: |
+          echo "VAR1: $VAR1"
+          echo "VAR2: $VAR2"
