@@ -1,4 +1,4 @@
-name: My Workflow
+name: Test
 
 on:
   workflow_dispatch:
@@ -17,12 +17,13 @@ jobs:
     environment: ${{ inputs.Environment }} # Set the environment variable
     steps:
       - name: Load variables
-        run: |
-          echo "::set-env name=VAR1::${{ env.ENV }}_VAR1"
-          echo "::set-env name=VAR2::${{ env.ENV }}_VAR2"
         env:
           ENV: ${{ inputs.Environment }}
-          VAR1_FILE: .github/variables.yml
+          VAR1_FILE: ./.github/variables.yml
+        run: |
+          echo "Loading variables from $VAR1_FILE"
+          vars=$(jq -r '.environments[] | select(.name == env.ENV) | .vars' $VAR1_FILE)
+          echo "$vars" >> $GITHUB_ENV
       - name: Print variables
         run: |
           echo "VAR1: $VAR1"
