@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.Environment }} # Set the environment variable
     steps:
+      - name: Verify file existence
+        run: |
+          ls $GITHUB_WORKSPACE/.github/variables.yml
       - name: Load variables
         env:
           ENV: ${{ inputs.Environment }}
