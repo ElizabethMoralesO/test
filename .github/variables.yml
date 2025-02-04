@@ -1,10 +1,9 @@
 environments:
-  dev:
-    VAR1: "dev-value-1"
-    VAR2: "dev-value-2"
-  staging:
-    VAR1: "staging-value-1"
-    VAR2: "staging-value-2"
-  prod:
-    VAR1: "prod-value-1"
-    VAR2: "prod-value-2"
+  - name: dev
+    vars:
+      VAR1: value1
+      VAR2: value2
+  - name: prod
+    vars:
+      VAR1: value3
+      VAR2: value4
