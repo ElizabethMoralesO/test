@@ -31,7 +31,7 @@ jobs:
           $vars = $jsonObject.environments | Where-Object {$_.name -eq "${{ inputs.Environment }}" } | Select-Object -ExpandProperty vars
           echo "Environment variables:"
           $vars | ForEach-Object { $_ } | ForEach-Object { echo " $_" }
-          $vars | ForEach-Object { $_ } |  >> $env:$GITHUB_ENV
+          $vars | ForEach-Object { $_ } | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           Get-Content -Path $env:$GITHUB_ENV
 
       - name: Print variables
