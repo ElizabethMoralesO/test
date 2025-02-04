@@ -28,9 +28,11 @@ jobs:
         run: |
           echo "Loading variables from $VAR1_FILE"
           yq -r '.environments[] | select(.name == $ENV) | .vars' $VAR1_FILE
+          echo "Environment variables:"
+          printenv
           echo "$vars" >> $GITHUB_ENV
-         # vars=$(jq -r '.environments[] | select(.name == env.ENV) | .vars' $VAR1_FILE)
-         # echo "$vars" >> $GITHUB_ENV
+          cat $GITHUB_ENV
+
       - name: Print variables
         run: |
           echo "VAR1: $VAR1"
