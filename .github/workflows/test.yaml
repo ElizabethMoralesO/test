@@ -23,18 +23,12 @@ jobs:
           cat ./.github/variables.yml
       - name: Load variables
         env:
-          VAR1_FILE: "./.github/variables.yml"
+          VAR1_FILE: "./.github/variables.json"
         run: |
-          # echo "Loading variables from ${{ env.VAR1_FILE }}"
-          # $vars = (Get-Content -Path ${{ env.VAR1_FILE }} -Raw | ConvertFrom-Json).environments | Where-Object {$_.name -eq "${{ inputs.Environment }}" } | Select-Object -ExpandProperty vars
-          # echo "Environment variables:"
-          # $vars | ForEach-Object { $_ } | ForEach-Object { echo " $_" }
-          # $vars | ForEach-Object { $_ } | Add-Content -Path $GITHUB_ENV
-          # Get-Content -Path $GITHUB_ENV
           echo "Loading variables from ${{ env.VAR1_FILE }}"
           $fileContent = Get-Content -Path ${{ env.VAR1_FILE }} -Raw -Encoding UTF8
-          $yamlObject = $fileContent | ConvertFrom-Yaml -ErrorAction Stop
-          $vars = $yamlObject.environments | Where-Object {$_.name -eq "${{ inputs.Environment }}" } | Select-Object -ExpandProperty vars
+          $jsonObject = $fileContent | ConvertFrom-Json
+          $vars = $jsonObject.environments | Where-Object {$_.name -eq "${{ inputs.Environment }}" } | Select-Object -ExpandProperty vars
           echo "Environment variables:"
           $vars | ForEach-Object { $_ } | ForEach-Object { echo " $_" }
           $vars | ForEach-Object { $_ } | Add-Content -Path $GITHUB_ENV
