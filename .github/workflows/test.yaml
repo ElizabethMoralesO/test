@@ -23,11 +23,10 @@ jobs:
           cat ./.github/variables.yml
       - name: Load variables
         env:
-          ENV: ${{ inputs.Environment }}
-          VAR1_FILE: ./.github/variables.yml
+          VAR1_FILE: "./.github/variables.yml"
         run: |
           echo "Loading variables from $VAR1_FILE"
-          $vars = (Get-Content -Path $VAR1_FILE -Raw | ConvertFrom-Json).environments | Where-Object {$_.name -eq $ENV} | Select-Object -ExpandProperty vars
+          $vars = (Get-Content -Path $VAR1_FILE -Raw | ConvertFrom-Json).environments | Where-Object {$_.name -eq ${{ inputs.Environment }} } | Select-Object -ExpandProperty vars
           echo "Environment variables:"
           $vars | ForEach-Object { $_ } | ForEach-Object { echo " $_" }
           $vars | ForEach-Object { $_ } | Add-Content -Path $GITHUB_ENV
