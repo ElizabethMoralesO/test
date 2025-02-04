@@ -20,7 +20,7 @@ jobs:
 
       - name: Verify file existence
         run: |
-          cat ./.github/variables.yml
+          cat ./.github/variables.json
       - name: Load variables
         env:
           VAR1_FILE: "./.github/variables.json"
