@@ -1,0 +1,35 @@
+name: customeronb
+
+on:
+  workflow_dispatch:
+    inputs:
+      Environment:
+        description: Environment to provision infra
+        required: true
+        default: 'qa'
+        type: choice
+        options:
+        - qa
+        - prod
+
+jobs:
+  read-json:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Index Automation
+        id: indexAutomation
+        uses: azure/powershell@v2
+        with:
+          inlineScript: ./customer.ps1 
+              -PrimaryLocation 'eastus2'
+              -Environment ${{ inputs.Environment }}
+              -client_name 'emorales'
+          azPSVersion: "latest"
+
+      - name: write
+        run: |
+          Write-Host "SearchIndex: ${{ steps.indexAutomation.outputs.SearchIndex }}"          
+          Write-Host "SemanticIndex: ${{ steps.indexAutomation.outputs.SemanticIndex }}"
