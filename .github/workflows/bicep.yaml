@@ -1,0 +1,28 @@
+name: Read JSON file
+
+on:
+  workflow_dispatch:
+    inputs:
+      Environment:
+        description: Environment to provision infra
+        required: true
+        default: 'qa'
+        type: choice
+        options:
+        - qa
+        - prod
+
+jobs:
+  read-json:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Read JSON file
+        env:
+          VAR1_FILE: "./.github/${{ inputs.Environment }}_param.json"
+        run: |
+          $json = Get-Content -Path ${{ env.VAR1_FILE }} -Raw | ConvertFrom-Json
+          $data_rg = $json.parameters.data_rg.value
+          Write-Host "##vso[task.setvariable variable=data_rg;]$data_rg"
