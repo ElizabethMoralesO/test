@@ -30,4 +30,4 @@ jobs:
 
       - name: write
         run: |
-          Write-Host "${{ steps.json.outputs.data_rg }}"
+          Write-Host "${outputs.data_rg}"
