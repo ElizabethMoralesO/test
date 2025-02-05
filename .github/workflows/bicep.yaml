@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Read JSON file
+        id: json
         env:
           VAR1_FILE: "./.github/${{ inputs.Environment }}_param.json"
         run: |
@@ -29,4 +30,4 @@ jobs:
 
       - name: write
         run: |
-          Write-Host "$env:data_rg"
+          Write-Host "${{ steps.json.outputs.data_rg }}"
