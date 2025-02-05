@@ -25,7 +25,7 @@ jobs:
           VAR1_FILE: "./.github/${{ inputs.Environment }}_param.json"
         run: |
           $json = Get-Content -Path ${{ env.VAR1_FILE }} -Raw | ConvertFrom-Json
-          "data_rg=$json.parameters.data_rg.value" >> $env:GITHUB_OUTPUT
+          "data_rg=$($json.parameters.data_rg.value)" >> $env:GITHUB_OUTPUT
           "userAssignedIdentity=$json.parameters.userAssignedIdentityname.value" >> $env:GITHUB_OUTPUT
           "StorageAccount=$json.parameters.storageAccountName.value" >> $env:GITHUB_OUTPUT
 
