@@ -26,3 +26,7 @@ jobs:
           $json = Get-Content -Path ${{ env.VAR1_FILE }} -Raw | ConvertFrom-Json
           $data_rg = $json.parameters.data_rg.value
           Write-Host "##vso[task.setvariable variable=data_rg;]$data_rg"
+
+      - name: write
+        run: |
+          Write-Host "$data_rg"
