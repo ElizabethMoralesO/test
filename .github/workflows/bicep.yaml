@@ -20,14 +20,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Read JSON file
-        id: json
+        id: env_values
         env:
           VAR1_FILE: "./.github/${{ inputs.Environment }}_param.json"
         run: |
           $json = Get-Content -Path ${{ env.VAR1_FILE }} -Raw | ConvertFrom-Json
-          $data_rg = $json.parameters.data_rg.value
-          Write-Host "##vso[task.setvariable variable=data_rg;]$data_rg"
+          "data_rg=$json.parameters.data_rg.value" >> $env:GITHUB_OUTPUT
+          "userAssignedIdentity=$json.parameters.userAssignedIdentityname.value" >> $env:GITHUB_OUTPUT
+          "StorageAccount=$json.parameters.storageAccountName.value" >> $env:GITHUB_OUTPUT
 
       - name: write
         run: |
-          Write-Host "${outputs.data_rg}"
+          Write-Host "${{ steps.env_values.outputs.data_rg }}"
