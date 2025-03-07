@@ -1,0 +1,26 @@
+name: Bicep CI
+
+on:
+  workflow_call:
+    inputs:
+      environmentName:
+        required: true
+        type: string
+      githubEnvironment:
+        required: true
+        type: string
+
+
+jobs:
+  deploy:
+    name: Deploy Self Serve App for [${{ inputs.environmentName }}]
+    environment: ${{ inputs.githubEnvironment }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Environment Setup for ${{ inputs.environmentName }}
+        shell: pwsh
+        run: |
+          echo "${{ inputs.environmentName }}"
