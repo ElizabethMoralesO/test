@@ -1,4 +1,4 @@
-name: Bicep CI
+name: '[template] Bicep CI'
 
 on:
   workflow_call:
