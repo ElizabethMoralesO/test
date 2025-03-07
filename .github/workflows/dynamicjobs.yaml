@@ -1,0 +1,25 @@
+name: Dynamic Jobs
+
+on:
+  workflow_dispatch:
+    inputs:
+      environments:
+        description: 'List of environments (comma-separated)'
+        required: true
+
+jobs:
+  dynamic-jobs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create jobs for each environment
+        uses: github.actions/job-creator@v1
+        with:
+          jobs: ${{ github.event.inputs.environments.split(',') }}
+          job-template: |
+            name: ${{ job }}
+            runs-on: ubuntu-latest
+            steps:
+              - name: Deploy to ${{ job }}
+                run: |
+                  # Deployment logic for ${{ job }} goes here
+                  echo "Deploying to ${{ job }}"
