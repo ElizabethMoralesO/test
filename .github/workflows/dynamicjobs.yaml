@@ -11,10 +11,15 @@ jobs:
   dynamic-jobs:
     runs-on: ubuntu-latest
     steps:
+      - name: Process environments input
+        run: |
+          ENVS=(${GITHUB_EVENT_INPUTS_environments//,/ })
+          echo "ENVS=${ENVS[*]}" >> $GITHUB_ENV
+
       - name: Create jobs for each environment
         uses: github.actions/job-creator@v1
         with:
-          jobs: ${{ github.event.inputs.environments.split(',') }}
+          jobs: ${{ env.ENVS }}
           job-template: |
             name: ${{ job }}
             runs-on: ubuntu-latest
