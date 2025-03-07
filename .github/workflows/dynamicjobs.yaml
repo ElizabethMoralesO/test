@@ -10,30 +10,11 @@ on:
 jobs:
   dynamic-jobs:
     runs-on: ubuntu-latest
-    steps:
-      - name: Process environments input
-        run: |
-          ENVS=(${GITHUB_EVENT_INPUTS_environments//,/ })
-          for env in "${ENVS[@]}"; do
-            echo "Creating job for $env"
-            echo "  name: $env"
-            echo "  runs-on: ubuntu-latest"
-            echo "  steps:"
-            echo "    - name: Deploy to $env"
-            echo "      run: |"
-            echo "        # Deployment logic for $env goes here"
-            echo "        echo 'Deploying to $env'"
-          done
+    matrix:
+      env: ${{ github.event.inputs.environments.split(',') }}
 
-      - name: Output jobs
+    steps:
+      - name: Deploy to ${{ matrix.env }}
         run: |
-          echo "jobs:"
-          for env in "${ENVS[@]}"; do
-            echo "  $env:"
-            echo "    runs-on: ubuntu-latest"
-            echo "    steps:"
-            echo "      - name: Deploy to $env"
-            echo "        run: |"
-            echo "          # Deployment logic for $env goes here"
-            echo "          echo 'Deploying to $env'"
-          done
+          # Deployment logic for ${{ matrix.env }} goes here
+          echo "Deploying to ${{ matrix.env }}"
