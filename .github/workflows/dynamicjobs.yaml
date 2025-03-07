@@ -1,6 +1,13 @@
 name: Bicep
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      doDeployBotServer:
+        description: 'Build/Deploy Self-Serve Bot Server App?'
+        required: true
+        default: true
+        type: boolean
 
   push:
     branches:
