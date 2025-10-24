@@ -41,7 +41,7 @@ This repository provides a **comprehensive pattern library** for GitHub Actions 
 
 ## 🚀 Live Demo
 
-Visit the [GitHub Pages interface](https://your-username.github.io/your-repository) to:
+Visit the [GitHub Pages interface](https://elizabethmoraleso.github.io/test/) to:
 
 - Choose your workflow pattern
 - Configure parameters through intuitive forms
@@ -83,25 +83,7 @@ Visit the [GitHub Pages interface](https://your-username.github.io/your-reposito
 3. Under "Source", select "GitHub Actions"
 4. The Pages deployment workflow will run automatically
 
-### 2. Create a Personal Access Token
-
-1. Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
-2. Click "Generate new token (classic)"
-3. Give it a name like "Workflow Trigger PAT"
-4. Set expiration (or no expiration for permanent use)
-5. ✅ Check the **`repo`** scope (full control of private repositories)
-6. Click "Generate token" and **copy it immediately**
-
-### 3. Add PAT to Repository Secrets
-
-1. Go to your repository **Settings**
-2. Navigate to **"Secrets and variables"** → **"Actions"**
-3. Click **"New repository secret"**
-4. Name: `WORKFLOW_PAT`
-5. Value: _Paste your Personal Access Token_
-6. Click **"Add secret"**
-
-### 4. Access the Trigger Interface
+### 2. Access the Trigger Interface
 
 Once GitHub Pages is deployed, access the interface at:
 `https://your-username.github.io/your-repository/`
@@ -116,7 +98,7 @@ Once GitHub Pages is deployed, access the interface at:
 4. **Click the pattern trigger button**
 5. **View the results** by clicking the provided links
 
-**That's it!** No authentication required from users - the PAT in repository secrets handles everything.
+**That's it!** No authentication required - users simply use GitHub's built-in workflow trigger interface.
 
 ## 🔍 Workflow Details
 
@@ -162,10 +144,10 @@ Edit `index.html` to:
 
 ## 🔐 Security Notes
 
-- Never commit Personal Access Tokens to the repository
-- Use tokens with minimal required permissions
-- Consider using GitHub Apps for production use
-- The web interface stores tokens in browser localStorage (optional)
+- No authentication tokens required - uses GitHub's built-in workflow triggers
+- Users need appropriate repository permissions to trigger workflows
+- All workflow triggers go through GitHub's standard security model
+- No sensitive data is stored in the web interface
 
 ## 📊 Monitoring
 
