@@ -1,14 +1,14 @@
-# Test Repository - Smart Workflow Trigger Demo
+# Test Repository - Simple Workflow Trigger Demo
 
-This repository demonstrates how to create a GitHub Pages site with **smart authentication** that can trigger GitHub Actions workflows using your existing GitHub identity or Personal Access Tokens.
+This repository demonstrates how to create a GitHub Pages site that can trigger GitHub Actions workflows using repository secrets with a Personal Access Token.
 
 ## 🚀 Features
 
-- **Smart Authentication**: Uses your existing GitHub login when possible, with Personal Access Token fallback
-- **Dummy Workflow**: A sample GitHub Actions workflow that can be triggered manually or programmatically
-- **GitHub Pages Trigger Interface**: A modern web interface to trigger workflows from your browser
+- **No Authentication Required**: Uses repository secrets for secure workflow triggering
+- **Dummy Workflow**: A sample GitHub Actions workflow that can be triggered from the web
+- **GitHub Pages Trigger Interface**: A simple web interface to trigger workflows
 - **Automated Pages Deployment**: Automatically deploys the trigger interface when changes are pushed
-- **No Server Required**: Everything runs client-side for maximum security and simplicity
+- **Secure**: Uses GitHub secrets to store PAT, no tokens exposed in frontend
 
 ## 📁 Repository Structure
 
@@ -44,35 +44,38 @@ This repository demonstrates how to create a GitHub Pages site with **smart auth
 4. Copy the **Client ID** and update `GITHUB_CLIENT_ID` in `index.html`
 5. Users can now login with their GitHub accounts - no tokens needed!
 
-#### Option B: Personal Access Token (Fallback)
+### 2. Create a Personal Access Token
 
-- Users can create their own tokens at [GitHub Settings > Personal access tokens](https://github.com/settings/tokens)
-- Token needs `repo` scope
-- Works immediately without OAuth setup
+1. Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
+2. Click "Generate new token (classic)"
+3. Give it a name like "Workflow Trigger PAT"
+4. Set expiration (or no expiration for permanent use)
+5. ✅ Check the **`repo`** scope (full control of private repositories)
+6. Click "Generate token" and **copy it immediately**
 
-### 3. Access the Trigger Interface
+### 3. Add PAT to Repository Secrets
+
+1. Go to your repository **Settings**
+2. Navigate to **"Secrets and variables"** → **"Actions"**
+3. Click **"New repository secret"**
+4. Name: `WORKFLOW_PAT`
+5. Value: _Paste your Personal Access Token_
+6. Click **"Add secret"**
+
+### 4. Access the Trigger Interface
 
 Once GitHub Pages is deployed, access the interface at:
 `https://elizabethmoraleso.github.io/test/`
 
 ## 🎯 How to Use
 
-### With OAuth (No Token Required!)
+1. **Open the GitHub Pages site** (link above)
+2. **Enter a custom message** (optional)
+3. **Select the target environment** (development/staging/production)
+4. **Click "Trigger Dummy Workflow"**
+5. **View the results** by clicking the provided links
 
-1. **Open the GitHub Pages site**
-2. **Click "Login with GitHub"**
-3. **Authorize the application** (one-time)
-4. **Customize the message and environment**
-5. **Click "Trigger Dummy Workflow"**
-
-### With Personal Access Token
-
-1. **Open the GitHub Pages site**
-2. **Click "Use Personal Token Instead"**
-3. **Enter your Personal Access Token**
-4. **Customize the message and environment**
-5. **Click "Trigger Dummy Workflow"**
-6. **View the workflow run** by clicking the provided link
+**That's it!** No authentication required from users - the PAT in repository secrets handles everything.
 
 ## 🔍 Workflow Details
 
