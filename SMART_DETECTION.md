@@ -83,8 +83,8 @@ This appears in:
 
 1. Fork repository
 2. Edit `index.html`
-3. Find and replace `YOUR_USERNAME`
-4. Find and replace `YOUR_REPOSITORY`
+3. Find and replace repository references
+4. Update hardcoded URLs
 5. Commit changes
 6. Wait for Pages rebuild
 

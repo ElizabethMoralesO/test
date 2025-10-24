@@ -41,7 +41,7 @@ This repository provides a **comprehensive pattern library** for GitHub Actions 
 
 ## 🚀 Live Demo
 
-Visit the [GitHub Pages interface](https://YOUR_USERNAME.github.io/YOUR_REPOSITORY) to:
+Visit the [GitHub Pages interface](https://your-username.github.io/your-repository) to:
 
 - Choose your workflow pattern
 - Configure parameters through intuitive forms
@@ -62,11 +62,16 @@ Visit the [GitHub Pages interface](https://YOUR_USERNAME.github.io/YOUR_REPOSITO
 ```
 ├── .github/
 │   └── workflows/
-│       ├── dummy-workflow.yaml     # The dummy workflow to be triggered
-│       └── deploy-pages.yaml       # Deploys GitHub Pages automatically
-├── index.html                      # GitHub Pages trigger interface
-├── customer.ps1                    # Existing PowerShell script
-└── README.md                       # This file
+│       ├── advanced-workflow.yaml      # Complex JSON-based workflow
+│       ├── simple-workflow.yaml        # Basic trigger workflow
+│       ├── multi-env-workflow.yaml     # Multi-environment pipeline
+│       ├── api-integration-workflow.yaml # API integration workflow
+│       └── deploy-pages.yaml           # GitHub Pages deployment
+├── index.html                          # Pattern selector interface
+├── ADVANCED_PATTERNS.md                # Comprehensive documentation
+├── SETUP.md                            # Quick setup guide
+├── customer.ps1                        # Existing script
+└── README.md                           # This file
 ```
 
 ## 🔧 Setup Instructions
@@ -108,14 +113,14 @@ Once GitHub Pages is deployed, access the interface at:
 1. **Open the GitHub Pages site** (link above)
 2. **Enter a custom message** (optional)
 3. **Select the target environment** (development/staging/production)
-4. **Click "Trigger Dummy Workflow"**
+4. **Click the pattern trigger button**
 5. **View the results** by clicking the provided links
 
 **That's it!** No authentication required from users - the PAT in repository secrets handles everything.
 
 ## 🔍 Workflow Details
 
-The dummy workflow (`dummy-workflow.yaml`) includes:
+The pattern workflows include:
 
 - **Manual Trigger**: Can be triggered from GitHub UI or via API
 - **Configurable Inputs**:
@@ -137,9 +142,9 @@ The dummy workflow (`dummy-workflow.yaml`) includes:
 
 ## 🛠️ Customization
 
-### Modify the Workflow
+### Modify the Workflows
 
-Edit `.github/workflows/dummy-workflow.yaml` to:
+Edit the workflow files in `.github/workflows/` to:
 
 - Add more steps
 - Change input parameters
