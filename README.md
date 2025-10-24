@@ -78,19 +78,6 @@ Visit the [GitHub Pages interface](https://YOUR_USERNAME.github.io/YOUR_REPOSITO
 3. Under "Source", select "GitHub Actions"
 4. The Pages deployment workflow will run automatically
 
-### 2. Authentication Setup (Choose One)
-
-#### Option A: GitHub OAuth (Recommended - Requires Setup)
-
-1. Go to [GitHub Settings > Developer settings > OAuth Apps](https://github.com/settings/developers)
-2. Click "New OAuth App"
-3. Fill in the details:
-   - **Application name**: "Workflow Trigger"
-   - **Homepage URL**: `https://elizabethmoraleso.github.io/test/`
-   - **Authorization callback URL**: `https://elizabethmoraleso.github.io/test/`
-4. Copy the **Client ID** and update `GITHUB_CLIENT_ID` in `index.html`
-5. Users can now login with their GitHub accounts - no tokens needed!
-
 ### 2. Create a Personal Access Token
 
 1. Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
@@ -112,7 +99,9 @@ Visit the [GitHub Pages interface](https://YOUR_USERNAME.github.io/YOUR_REPOSITO
 ### 4. Access the Trigger Interface
 
 Once GitHub Pages is deployed, access the interface at:
-`https://elizabethmoraleso.github.io/test/`
+`https://your-username.github.io/your-repository/`
+
+🎯 **Smart Configuration**: The interface automatically detects your repository information from the GitHub Pages URL - no manual editing required!
 
 ## 🎯 How to Use
 

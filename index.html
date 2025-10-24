@@ -331,8 +331,54 @@
     </div>
 
     <script>
-        const REPO_OWNER = 'ElizabethMoralesO';
-        const REPO_NAME = 'test';
+        // Auto-detect repository information from GitHub Pages URL
+        function getRepoInfo() {
+            const hostname = window.location.hostname;
+            const pathname = window.location.pathname;
+            
+            if (hostname.endsWith('.github.io')) {
+                // GitHub Pages URL format: username.github.io/repository
+                const owner = hostname.split('.')[0];
+                const repo = pathname.split('/')[1] || owner; // If no repo in path, assume it's username.github.io (same as username)
+                return { owner, repo };
+            } else if (hostname === 'localhost' || hostname.startsWith('127.0.0.1') || hostname.startsWith('file://')) {
+                // Local development - use fallback values
+                return { 
+                    owner: 'ElizabethMoralesO', 
+                    repo: 'test' 
+                };
+            } else {
+                // Custom domain - try to extract from pathname or use defaults
+                const pathParts = pathname.split('/').filter(Boolean);
+                return { 
+                    owner: pathParts[0] || 'ElizabethMoralesO', 
+                    repo: pathParts[1] || 'test' 
+                };
+            }
+        }
+        
+        const { owner: REPO_OWNER, repo: REPO_NAME } = getRepoInfo();
+        console.log(`🔍 Auto-detected repository: ${REPO_OWNER}/${REPO_NAME}`);
+        
+        // Initialize page with auto-detected repository info
+        function initializePage() {
+            // Update repository display
+            const repoNameElement = document.getElementById('repo-name');
+            if (repoNameElement) {
+                repoNameElement.textContent = `${REPO_OWNER}/${REPO_NAME}`;
+                repoNameElement.style.fontFamily = 'monospace';
+                repoNameElement.style.background = '#f6f8fa';
+                repoNameElement.style.padding = '2px 6px';
+                repoNameElement.style.borderRadius = '3px';
+                repoNameElement.style.fontSize = '14px';
+            }
+            
+            // Select default pattern
+            selectPattern('advanced');
+        }
+        
+        // Call initialization when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
         
         // Available workflow patterns
         const WORKFLOW_PATTERNS = {
@@ -725,10 +771,7 @@
 
         // Redirect to simple workflow
         function redirectToSimpleWorkflow(message, environment, workflowFile) {
-            const repoOwner = 'YOUR_USERNAME'; // Replace with your actual GitHub username
-            const repoName = 'YOUR_REPOSITORY'; // Replace with your actual repository name
-            
-            const dispatchUrl = `https://github.com/${repoOwner}/${repoName}/actions/workflows/${workflowFile}`;
+            const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${workflowFile}`;
             
             showMessage('success', `
                 ✅ Simple workflow ready to trigger!<br><br>
@@ -745,10 +788,7 @@
 
         // Redirect to multi-environment workflow
         function redirectToMultiEnvWorkflow(config, workflowFile) {
-            const repoOwner = 'YOUR_USERNAME'; // Replace with your actual GitHub username
-            const repoName = 'YOUR_REPOSITORY'; // Replace with your actual repository name
-            
-            const dispatchUrl = `https://github.com/${repoOwner}/${repoName}/actions/workflows/${workflowFile}`;
+            const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${workflowFile}`;
             
             showMessage('success', `
                 ✅ Multi-environment pipeline configured!<br><br>
@@ -767,10 +807,7 @@
 
         // Redirect to API integration workflow
         function redirectToApiIntegrationWorkflow(config, workflowFile) {
-            const repoOwner = 'YOUR_USERNAME'; // Replace with your actual GitHub username
-            const repoName = 'YOUR_REPOSITORY'; // Replace with your actual repository name
-            
-            const dispatchUrl = `https://github.com/${repoOwner}/${repoName}/actions/workflows/${workflowFile}`;
+            const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${workflowFile}`;
             
             showMessage('success', `
                 ✅ API integration workflow configured!<br><br>
