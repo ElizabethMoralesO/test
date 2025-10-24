@@ -1,0 +1,227 @@
+name: Advanced Workflow with JSON Configuration
+
+on:
+    workflow_dispatch:
+        inputs:
+            config_json:
+                description: "JSON Configuration (generated from GitHub Pages)"
+                required: true
+                type: string
+                default: |
+                    {
+                      "deployment": {
+                        "environment": "development",
+                        "region": "us-east-1",
+                        "version": "latest",
+                        "replicas": 3
+                      },
+                      "application": {
+                        "name": "sample-app",
+                        "namespace": "default",
+                        "dockerImage": "nginx:latest",
+                        "resources": "medium"
+                      },
+                      "database": {
+                        "type": "postgresql",
+                        "version": "13.4",
+                        "size": "10Gi"
+                      },
+                      "advanced": {
+                        "enableLogging": true,
+                        "enableMonitoring": true,
+                        "customEnvVars": {},
+                        "deploymentNotes": "Automated deployment"
+                      }
+                    }
+
+    # Can also be triggered by other workflows (reusable workflow pattern)
+    workflow_call:
+        inputs:
+            config_json:
+                description: "JSON Configuration"
+                required: true
+                type: string
+
+jobs:
+    parse-configuration:
+        runs-on: ubuntu-latest
+        outputs:
+            # Parse JSON and create outputs for other jobs to consume
+            environment: ${{ steps.parse.outputs.environment }}
+            region: ${{ steps.parse.outputs.region }}
+            app_name: ${{ steps.parse.outputs.app_name }}
+            docker_image: ${{ steps.parse.outputs.docker_image }}
+            replicas: ${{ steps.parse.outputs.replicas }}
+            db_matrix: ${{ steps.parse.outputs.db_matrix }}
+            resource_matrix: ${{ steps.parse.outputs.resource_matrix }}
+            env_vars: ${{ steps.parse.outputs.env_vars }}
+
+        steps:
+            - name: Parse JSON Configuration
+              id: parse
+              run: |
+                  echo "🔍 Parsing JSON configuration..."
+
+                  # Parse the JSON input
+                  CONFIG='${{ inputs.config_json }}'
+                  echo "Received config: $CONFIG"
+
+                  # Extract values using jq
+                  ENVIRONMENT=$(echo "$CONFIG" | jq -r '.deployment.environment // "development"')
+                  REGION=$(echo "$CONFIG" | jq -r '.deployment.region // "us-east-1"')
+                  VERSION=$(echo "$CONFIG" | jq -r '.deployment.version // "latest"')
+                  REPLICAS=$(echo "$CONFIG" | jq -r '.deployment.replicas // 3')
+
+                  APP_NAME=$(echo "$CONFIG" | jq -r '.application.name // "default-app"')
+                  NAMESPACE=$(echo "$CONFIG" | jq -r '.application.namespace // "default"')
+                  DOCKER_IMAGE=$(echo "$CONFIG" | jq -r '.application.dockerImage // "nginx:latest"')
+                  RESOURCES=$(echo "$CONFIG" | jq -r '.application.resources // "medium"')
+
+                  DB_TYPE=$(echo "$CONFIG" | jq -r '.database.type // "postgresql"')
+                  DB_VERSION=$(echo "$CONFIG" | jq -r '.database.version // "13.4"')
+                  DB_SIZE=$(echo "$CONFIG" | jq -r '.database.size // "10Gi"')
+
+                  ENABLE_LOGGING=$(echo "$CONFIG" | jq -r '.advanced.enableLogging // true')
+                  ENABLE_MONITORING=$(echo "$CONFIG" | jq -r '.advanced.enableMonitoring // true')
+                  CUSTOM_ENV_VARS=$(echo "$CONFIG" | jq -c '.advanced.customEnvVars // {}')
+                  DEPLOYMENT_NOTES=$(echo "$CONFIG" | jq -r '.advanced.deploymentNotes // ""')
+
+                  # Set outputs for other jobs to use
+                  echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+                  echo "region=$REGION" >> $GITHUB_OUTPUT
+                  echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
+                  echo "docker_image=$DOCKER_IMAGE" >> $GITHUB_OUTPUT
+                  echo "replicas=$REPLICAS" >> $GITHUB_OUTPUT
+                  echo "env_vars=$CUSTOM_ENV_VARS" >> $GITHUB_OUTPUT
+
+                  # Create matrices for parallel job execution
+                  DB_MATRIX=$(echo "$CONFIG" | jq -c '{
+                    "include": [
+                      {
+                        "type": "'$DB_TYPE'",
+                        "version": "'$DB_VERSION'",
+                        "size": "'$DB_SIZE'",
+                        "environment": "'$ENVIRONMENT'"
+                      }
+                    ]
+                  }')
+
+                  RESOURCE_MATRIX=$(echo "$CONFIG" | jq -c '{
+                    "include": [
+                      {
+                        "profile": "'$RESOURCES'",
+                        "replicas": '$REPLICAS',
+                        "region": "'$REGION'"
+                      }
+                    ]
+                  }')
+
+                  echo "db_matrix=$DB_MATRIX" >> $GITHUB_OUTPUT
+                  echo "resource_matrix=$RESOURCE_MATRIX" >> $GITHUB_OUTPUT
+
+                  # Display parsed configuration
+                  echo "✅ Configuration parsed successfully:"
+                  echo "📱 Application: $APP_NAME ($DOCKER_IMAGE)"
+                  echo "🌍 Environment: $ENVIRONMENT ($REGION)"
+                  echo "🗄️ Database: $DB_TYPE $DB_VERSION ($DB_SIZE)"
+                  echo "⚖️ Resources: $RESOURCES profile with $REPLICAS replicas"
+                  echo "🔧 Logging: $ENABLE_LOGGING | Monitoring: $ENABLE_MONITORING"
+
+    # Example job that uses the parsed configuration
+    deploy-application:
+        needs: parse-configuration
+        runs-on: ubuntu-latest
+        strategy:
+            matrix: ${{ fromJson(needs.parse-configuration.outputs.resource_matrix) }}
+
+        steps:
+            - name: Deploy Application
+              run: |
+                  echo "🚀 Deploying Application with parsed configuration..."
+                  echo "Application: ${{ needs.parse-configuration.outputs.app_name }}"
+                  echo "Environment: ${{ needs.parse-configuration.outputs.environment }}"
+                  echo "Region: ${{ matrix.region }}"
+                  echo "Docker Image: ${{ needs.parse-configuration.outputs.docker_image }}"
+                  echo "Resource Profile: ${{ matrix.profile }}"
+                  echo "Replicas: ${{ matrix.replicas }}"
+
+                  # Simulate deployment steps
+                  echo "📦 Pulling Docker image..."
+                  sleep 2
+                  echo "⚙️ Applying Kubernetes manifests..."
+                  sleep 2
+                  echo "🔄 Scaling to ${{ matrix.replicas }} replicas..."
+                  sleep 2
+                  echo "✅ Deployment completed successfully!"
+
+    # Example database setup job using matrix strategy
+    setup-database:
+        needs: parse-configuration
+        runs-on: ubuntu-latest
+        strategy:
+            matrix: ${{ fromJson(needs.parse-configuration.outputs.db_matrix) }}
+
+        steps:
+            - name: Setup Database
+              run: |
+                  echo "🗄️ Setting up database with parsed configuration..."
+                  echo "Database Type: ${{ matrix.type }}"
+                  echo "Version: ${{ matrix.version }}"
+                  echo "Size: ${{ matrix.size }}"
+                  echo "Environment: ${{ matrix.environment }}"
+
+                  # Simulate database setup
+                  echo "📋 Creating database instance..."
+                  sleep 3
+                  echo "🔧 Configuring ${{ matrix.type }} ${{ matrix.version }}..."
+                  sleep 2
+                  echo "💾 Allocating ${{ matrix.size }} storage..."
+                  sleep 2
+                  echo "✅ Database setup completed!"
+
+    # Example job demonstrating custom environment variables
+    configure-environment:
+        needs: parse-configuration
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Apply Environment Configuration
+              run: |
+                  echo "🔧 Configuring environment variables..."
+
+                  # Parse custom environment variables from JSON
+                  ENV_VARS='${{ needs.parse-configuration.outputs.env_vars }}'
+                  echo "Custom environment variables: $ENV_VARS"
+
+                  # In a real scenario, you would apply these to your deployment
+                  echo "✅ Environment configuration applied!"
+
+    # Summary job that demonstrates the power of this approach
+    deployment-summary:
+        needs:
+            [
+                parse-configuration,
+                deploy-application,
+                setup-database,
+                configure-environment,
+            ]
+        runs-on: ubuntu-latest
+        if: always()
+
+        steps:
+            - name: Generate Deployment Summary
+              run: |
+                  echo "📊 DEPLOYMENT SUMMARY"
+                  echo "===================="
+                  echo "🎯 Successfully processed JSON configuration with 15+ inputs"
+                  echo "📱 Application: ${{ needs.parse-configuration.outputs.app_name }}"
+                  echo "🌍 Environment: ${{ needs.parse-configuration.outputs.environment }}"
+                  echo "🚀 Status: Deployment pipeline completed"
+                  echo ""
+                  echo "✅ Benefits demonstrated:"
+                  echo "   • Overcame GitHub's 10-input limitation"
+                  echo "   • Generated dynamic matrices from JSON"
+                  echo "   • Created reusable workflow pattern"
+                  echo "   • Enabled complex configuration management"
+                  echo ""
+                  echo "🎉 This approach allows unlimited inputs via JSON payload!"

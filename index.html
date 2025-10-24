@@ -118,34 +118,156 @@
         <p class="subtitle">Trigger GitHub Actions workflows from your browser</p>
         
         <div class="info-box">
-            <strong>🚀 Simple Workflow Trigger</strong><br>
-            This page helps you trigger the "Dummy Workflow" via GitHub Actions. No authentication required!
-            Simply fill out the form below and you'll be directed to GitHub Actions to run the workflow.
+            <strong>🚀 Advanced Workflow Configuration</strong><br>
+            This page demonstrates overcoming GitHub Actions' 10-input limitation by using JSON payloads.
+            Configure 11+ parameters below, generate a JSON payload, and trigger a reusable workflow that parses the configuration.
             <br><br>
             <strong>Repository:</strong> <span id="repo-name">ElizabethMoralesO/test</span><br>
-            <small style="color: #666;">Version: 2024-10-24 | Method: GitHub Actions Redirect</small>
+            <strong>Benefits:</strong> ✅ 10+ inputs ✅ Dynamic configuration ✅ User-friendly UI ✅ JSON-based workflows
         </div>
 
-        <!-- Workflow Form -->
+        <!-- Advanced Configuration Form (11+ Inputs) -->
         <form id="triggerForm">
-            <h3>🎯 Trigger Workflow</h3>
+            <h3>🎯 Advanced Workflow Configuration</h3>
+            
+            <!-- Deployment Configuration -->
+            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d0d7de; border-radius: 6px;">
+                <legend style="font-weight: bold; color: #0969da;">🚀 Deployment Settings</legend>
+                
+                <div class="form-group">
+                    <label for="environment">Target Environment:</label>
+                    <select id="environment" name="environment" required>
+                        <option value="development">Development</option>
+                        <option value="staging">Staging</option>
+                        <option value="production">Production</option>
+                        <option value="qa">QA</option>
+                        <option value="integration">Integration</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="region">Deployment Region:</label>
+                    <select id="region" name="region" required>
+                        <option value="us-east-1">US East (N. Virginia)</option>
+                        <option value="us-west-2">US West (Oregon)</option>
+                        <option value="eu-west-1">Europe (Ireland)</option>
+                        <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="version">Application Version:</label>
+                    <input type="text" id="version" name="version" placeholder="v1.2.3 or latest" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="replicas">Replica Count:</label>
+                    <input type="number" id="replicas" name="replicas" min="1" max="10" value="3" required>
+                </div>
+            </fieldset>
 
-            <div class="form-group">
-                <label for="message">Custom Message:</label>
-                <textarea id="message" name="message" placeholder="Enter a custom message for the workflow...">Hello from GitHub Pages! 👋</textarea>
-            </div>
+            <!-- Application Configuration -->
+            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d0d7de; border-radius: 6px;">
+                <legend style="font-weight: bold; color: #0969da;">⚙️ Application Settings</legend>
+                
+                <div class="form-group">
+                    <label for="appName">Application Name:</label>
+                    <input type="text" id="appName" name="appName" placeholder="my-application" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="namespace">Kubernetes Namespace:</label>
+                    <input type="text" id="namespace" name="namespace" placeholder="default" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dockerImage">Docker Image:</label>
+                    <input type="text" id="dockerImage" name="dockerImage" placeholder="nginx:latest" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="resources">Resource Limits:</label>
+                    <select id="resources" name="resources" required>
+                        <option value="small">Small (0.5 CPU, 512Mi RAM)</option>
+                        <option value="medium">Medium (1 CPU, 1Gi RAM)</option>
+                        <option value="large">Large (2 CPU, 2Gi RAM)</option>
+                        <option value="xlarge">XLarge (4 CPU, 4Gi RAM)</option>
+                    </select>
+                </div>
+            </fieldset>
 
-            <div class="form-group">
-                <label for="environment">Target Environment:</label>
-                <select id="environment" name="environment">
-                    <option value="development">Development</option>
-                    <option value="staging">Staging</option>
-                    <option value="production">Production</option>
-                </select>
-            </div>
+            <!-- Database Configuration -->
+            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d0d7de; border-radius: 6px;">
+                <legend style="font-weight: bold; color: #0969da;">🗄️ Database Settings</legend>
+                
+                <div class="form-group">
+                    <label for="dbType">Database Type:</label>
+                    <select id="dbType" name="dbType" required>
+                        <option value="postgresql">PostgreSQL</option>
+                        <option value="mysql">MySQL</option>
+                        <option value="mongodb">MongoDB</option>
+                        <option value="redis">Redis</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dbVersion">Database Version:</label>
+                    <input type="text" id="dbVersion" name="dbVersion" placeholder="13.4" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dbSize">Database Size:</label>
+                    <select id="dbSize" name="dbSize" required>
+                        <option value="10Gi">Small (10GB)</option>
+                        <option value="50Gi">Medium (50GB)</option>
+                        <option value="100Gi">Large (100GB)</option>
+                        <option value="500Gi">XLarge (500GB)</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <!-- Advanced Options -->
+            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d0d7de; border-radius: 6px;">
+                <legend style="font-weight: bold; color: #0969da;">🔧 Advanced Options</legend>
+                
+                <div class="form-group">
+                    <label for="enableLogging">
+                        <input type="checkbox" id="enableLogging" name="enableLogging" checked style="width: auto; margin-right: 8px;">
+                        Enable Enhanced Logging
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="enableMonitoring">
+                        <input type="checkbox" id="enableMonitoring" name="enableMonitoring" checked style="width: auto; margin-right: 8px;">
+                        Enable Monitoring & Alerting
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customEnvVars">Custom Environment Variables (JSON):</label>
+                    <textarea id="customEnvVars" name="customEnvVars" placeholder='{"NODE_ENV": "production", "LOG_LEVEL": "info"}' rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deploymentNotes">Deployment Notes:</label>
+                    <textarea id="deploymentNotes" name="deploymentNotes" placeholder="Enter any special notes for this deployment..." rows="3"></textarea>
+                </div>
+            </fieldset>
+
+            <!-- Generated JSON Preview -->
+            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #f0c040; border-radius: 6px; background-color: #fff8dc;">
+                <legend style="font-weight: bold; color: #b8860b;">📋 Generated Configuration JSON</legend>
+                <pre id="jsonPreview" style="background: #f6f8fa; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; max-height: 200px;">{
+  "deployment": {},
+  "application": {},
+  "database": {},
+  "advanced": {}
+}</pre>
+            </fieldset>
 
             <button type="submit" class="btn" id="triggerBtn">
-                🎯 Trigger Dummy Workflow
+                🎯 Generate JSON & Trigger Advanced Workflow
             </button>
         </form>
 
@@ -166,58 +288,143 @@
         // Setup event listeners
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('triggerForm').addEventListener('submit', handleWorkflowTrigger);
+            
+            // Add real-time JSON preview updates
+            const formInputs = document.querySelectorAll('#triggerForm input, #triggerForm select, #triggerForm textarea');
+            formInputs.forEach(input => {
+                input.addEventListener('input', updateJSONPreview);
+                input.addEventListener('change', updateJSONPreview);
+            });
+            
+            // Initial JSON preview
+            updateJSONPreview();
         });
+
+        // Update JSON preview in real-time
+        function updateJSONPreview() {
+            const config = collectFormData();
+            const jsonPreview = document.getElementById('jsonPreview');
+            jsonPreview.textContent = JSON.stringify(config, null, 2);
+        }
+
+        // Collect all form data into structured JSON
+        function collectFormData() {
+            return {
+                deployment: {
+                    environment: document.getElementById('environment').value,
+                    region: document.getElementById('region').value,
+                    version: document.getElementById('version').value,
+                    replicas: parseInt(document.getElementById('replicas').value) || 3
+                },
+                application: {
+                    name: document.getElementById('appName').value,
+                    namespace: document.getElementById('namespace').value,
+                    dockerImage: document.getElementById('dockerImage').value,
+                    resources: document.getElementById('resources').value
+                },
+                database: {
+                    type: document.getElementById('dbType').value,
+                    version: document.getElementById('dbVersion').value,
+                    size: document.getElementById('dbSize').value
+                },
+                advanced: {
+                    enableLogging: document.getElementById('enableLogging').checked,
+                    enableMonitoring: document.getElementById('enableMonitoring').checked,
+                    customEnvVars: parseJSON(document.getElementById('customEnvVars').value),
+                    deploymentNotes: document.getElementById('deploymentNotes').value
+                },
+                metadata: {
+                    timestamp: new Date().toISOString(),
+                    triggeredBy: 'github-pages',
+                    formVersion: '1.0',
+                    totalInputs: 15 // Demonstrating 15 inputs vs GitHub's 10 limit
+                }
+            };
+        }
+
+        // Safely parse JSON with fallback
+        function parseJSON(str) {
+            if (!str.trim()) return {};
+            try {
+                return JSON.parse(str);
+            } catch (e) {
+                return { error: 'Invalid JSON format' };
+            }
+        }
 
         // Handle workflow trigger
         async function handleWorkflowTrigger(e) {
             e.preventDefault();
             
-            const message = document.getElementById('message').value;
-            const environment = document.getElementById('environment').value;
+            const config = collectFormData();
             const triggerBtn = document.getElementById('triggerBtn');
+            
+            // Validate required fields
+            if (!config.application.name || !config.deployment.version) {
+                showMessage('error', '❌ Please fill in all required fields (Application Name, Version)');
+                return;
+            }
             
             // Reset status and disable button
             hideMessage();
             triggerBtn.disabled = true;
-            triggerBtn.textContent = '🔄 Creating trigger request...';
+            triggerBtn.textContent = '🔄 Generating JSON payload...';
             
-            // Direct user to GitHub Actions page
-            redirectToGitHubActions(message, environment);
+            // Generate the configuration and redirect to GitHub Actions
+            redirectToGitHubActions(config);
             
             // Re-enable button
             triggerBtn.disabled = false;
-            triggerBtn.textContent = '🎯 Trigger Dummy Workflow';
+            triggerBtn.textContent = '🎯 Generate JSON & Trigger Advanced Workflow';
         }
 
-        // Direct user to GitHub Actions page to trigger workflow
-        function redirectToGitHubActions(message, environment) {
-            // Create the GitHub Actions trigger URL with pre-filled parameters
-            const actionsUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WEB_TRIGGER_WORKFLOW}`;
+        // Direct user to GitHub Actions page to trigger workflow with JSON payload
+        function redirectToGitHubActions(config) {
+            // Create the GitHub Actions trigger URL
+            const actionsUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/advanced-workflow.yaml`;
+            
+            // Create a compact JSON string for display
+            const jsonPayload = JSON.stringify(config, null, 2);
             
             showMessage('success', `
-                🎯 <strong>Ready to trigger workflow!</strong><br><br>
-                <strong>Your settings:</strong><br>
-                📝 Message: ${message}<br>
-                🌍 Environment: ${environment}<br><br>
+                🎯 <strong>Advanced Configuration Ready!</strong><br><br>
+                <strong>Configuration Summary:</strong><br>
+                � App: ${config.application.name} (${config.application.dockerImage})<br>
+                🌍 Environment: ${config.deployment.environment} (${config.deployment.region})<br>
+                🗄️ Database: ${config.database.type} ${config.database.version}<br>
+                ⚖️ Scale: ${config.deployment.replicas} replicas (${config.application.resources})<br>
+                📊 Total Inputs: ${config.metadata.totalInputs} (exceeds GitHub's 10-input limit!)<br><br>
+                
+                <details style="margin: 10px 0;">
+                    <summary style="cursor: pointer; font-weight: bold;">📋 View Complete JSON Payload</summary>
+                    <pre style="background: #f6f8fa; padding: 10px; border-radius: 4px; font-size: 11px; max-height: 200px; overflow-y: auto; margin: 10px 0;">${jsonPayload}</pre>
+                </details>
                 
                 <a href="${actionsUrl}" target="_blank" class="btn" style="color: white; text-decoration: none; display: inline-block; margin: 10px 0;">
-                    🚀 Open GitHub Actions & Trigger Workflow
+                    🚀 Trigger Advanced Workflow in GitHub Actions
                 </a><br>
                 
                 <small>
-                <strong>Instructions:</strong><br>
+                <strong>Next Steps:</strong><br>
                 1. Click the button above to open GitHub Actions<br>
                 2. Click "Run workflow" button<br>
-                3. Enter your message: <code>${message}</code><br>
-                4. Select environment: <code>${environment}</code><br>
-                5. Click "Run workflow" to execute
+                3. Paste the JSON configuration into the workflow input<br>
+                4. The reusable workflow will parse this JSON to generate dynamic matrices and variables<br>
+                5. This overcomes GitHub's 10-input limitation! 🎉
                 </small>
             `);
+            
+            // Copy JSON to clipboard for easy pasting
+            navigator.clipboard.writeText(jsonPayload).then(() => {
+                console.log('JSON configuration copied to clipboard');
+            }).catch(err => {
+                console.log('Could not copy to clipboard:', err);
+            });
             
             // Auto-open GitHub Actions page
             setTimeout(() => {
                 window.open(actionsUrl, '_blank');
-            }, 2000);
+            }, 3000);
         }
 
         // Utility functions

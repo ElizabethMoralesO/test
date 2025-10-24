@@ -1,14 +1,16 @@
-# Test Repository - Simple Workflow Trigger Demo
+# Advanced GitHub Actions with Unlimited Inputs
 
-This repository demonstrates how to create a GitHub Pages site that can trigger GitHub Actions workflows using repository secrets with a Personal Access Token.
+This repository demonstrates how to **overcome GitHub Actions' 10-input limitation** using GitHub Pages to generate JSON payloads for complex workflow configurations.
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **No Authentication Required**: Uses repository secrets for secure workflow triggering
-- **Dummy Workflow**: A sample GitHub Actions workflow that can be triggered from the web
-- **GitHub Pages Trigger Interface**: A simple web interface to trigger workflows
-- **Automated Pages Deployment**: Automatically deploys the trigger interface when changes are pushed
-- **Secure**: Uses GitHub secrets to store PAT, no tokens exposed in frontend
+- **🔢 Unlimited Inputs**: Overcome GitHub's 10-input limit using JSON payloads
+- **🎨 User-Friendly Interface**: Web-based configuration instead of YAML editing
+- **📊 Dynamic Matrices**: Generate job matrices from JSON configuration
+- **🔄 Reusable Workflows**: Template-based workflow execution
+- **⚡ Real-time Preview**: See generated JSON as you configure
+- **🎯 15+ Input Fields**: Demonstrates deployment, application, database, and advanced settings
+- **🔧 Extensible**: Easy to add API integrations and custom validation
 
 ## 📁 Repository Structure
 
