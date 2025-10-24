@@ -86,7 +86,7 @@ Visit the [GitHub Pages interface](https://elizabethmoraleso.github.io/test/) to
 ### 2. Access the Trigger Interface
 
 Once GitHub Pages is deployed, access the interface at:
-`https://your-username.github.io/your-repository/`
+`https://elizabethmoraleso.github.io/test/`
 
 🎯 **Smart Configuration**: The interface automatically detects your repository information from the GitHub Pages URL - no manual editing required!
 

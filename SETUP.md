@@ -12,7 +12,7 @@ This repository provides a **zero-configuration GitHub Actions pattern library**
 ## Step 2: Access Your Pattern Library
 
 Once GitHub Pages deploys (usually 1-2 minutes), visit:
-`https://your-username.github.io/your-repository/`
+`https://elizabethmoraleso.github.io/test/`
 
 ## ✅ That's it!
 
