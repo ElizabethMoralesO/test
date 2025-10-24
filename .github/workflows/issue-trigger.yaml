@@ -1,0 +1,80 @@
+name: Issue Trigger Workflow
+
+on:
+    issues:
+        types: [opened]
+
+jobs:
+    check-trigger-issue:
+        if: contains(github.event.issue.title, '[WORKFLOW-TRIGGER]')
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Parse issue body
+              id: parse
+              run: |
+                  # Extract parameters from issue body
+                  ISSUE_BODY="${{ github.event.issue.body }}"
+
+                  # Extract message (look for Message: line)
+                  MESSAGE=$(echo "$ISSUE_BODY" | grep "Message:" | sed 's/Message: *//' | head -1)
+                  if [ -z "$MESSAGE" ]; then
+                    MESSAGE="Triggered from GitHub Pages via Issue"
+                  fi
+
+                  # Extract environment (look for Environment: line)  
+                  ENVIRONMENT=$(echo "$ISSUE_BODY" | grep "Environment:" | sed 's/Environment: *//' | head -1)
+                  if [ -z "$ENVIRONMENT" ]; then
+                    ENVIRONMENT="development"
+                  fi
+
+                  echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+                  echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+
+                  echo "📝 Parsed Message: $MESSAGE"
+                  echo "🌍 Parsed Environment: $ENVIRONMENT"
+
+            - name: Close trigger issue
+              run: |
+                  curl -X PATCH \
+                    -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}" \
+                    -d '{"state":"closed"}'
+
+            - name: Trigger dummy workflow
+              run: |
+                  curl -X POST \
+                    -H "Authorization: token ${{ secrets.WORKFLOW_PAT }}" \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    -H "Content-Type: application/json" \
+                    "https://api.github.com/repos/${{ github.repository }}/actions/workflows/dummy-workflow.yaml/dispatches" \
+                    -d "{
+                      \"ref\": \"main\",
+                      \"inputs\": {
+                        \"message\": \"${{ steps.parse.outputs.message }}\",
+                        \"environment\": \"${{ steps.parse.outputs.environment }}\"
+                      }
+                    }"
+
+                  if [ $? -eq 0 ]; then
+                    echo "✅ Successfully triggered dummy-workflow.yaml"
+                  else
+                    echo "❌ Failed to trigger dummy-workflow.yaml"
+                    exit 1
+                  fi
+
+            - name: Comment on issue
+              if: always()
+              run: |
+                  if [ "${{ job.status }}" = "success" ]; then
+                    COMMENT="✅ **Workflow triggered successfully!**\n\n🔗 [View workflow runs](https://github.com/${{ github.repository }}/actions)"
+                  else
+                    COMMENT="❌ **Failed to trigger workflow.**\n\nPlease check the [workflow logs](https://github.com/${{ github.repository }}/actions) for details."
+                  fi
+
+                  curl -X POST \
+                    -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments" \
+                    -d "{\"body\":\"$COMMENT\"}"
