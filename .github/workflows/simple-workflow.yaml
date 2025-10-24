@@ -1,0 +1,42 @@
+name: Simple Workflow Trigger
+
+on:
+    workflow_dispatch:
+        inputs:
+            message:
+                description: "Message for the workflow"
+                required: true
+                default: "Hello from Simple Trigger!"
+            environment:
+                description: "Target environment"
+                required: true
+                type: choice
+                options:
+                    - development
+                    - staging
+                    - production
+
+jobs:
+    simple-job:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 📋 Display Configuration
+              run: |
+                  echo "🎯 Simple Workflow Triggered!"
+                  echo "📝 Message: ${{ github.event.inputs.message }}"
+                  echo "🌍 Environment: ${{ github.event.inputs.environment }}"
+                  echo "⏰ Triggered at: $(date)"
+
+            - name: 🚀 Simulate Deployment
+              run: |
+                  echo "Starting deployment to ${{ github.event.inputs.environment }}..."
+                  sleep 3
+                  echo "✅ Deployment completed successfully!"
+
+            - name: 📧 Send Notification
+              run: |
+                  echo "📧 Sending notification..."
+                  echo "Subject: Deployment Complete - ${{ github.event.inputs.environment }}"
+                  echo "Body: ${{ github.event.inputs.message }}"
+                  echo "Status: ✅ Success"

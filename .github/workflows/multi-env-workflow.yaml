@@ -1,0 +1,149 @@
+name: Multi-Environment Pipeline
+
+on:
+    workflow_dispatch:
+        inputs:
+            release_version:
+                description: "Release version (e.g., v1.0.0)"
+                required: true
+            source_environment:
+                description: "Source environment"
+                required: true
+                type: choice
+                options:
+                    - development
+                    - staging
+                    - production
+            target_environments:
+                description: "Target environments (comma-separated: qa,staging,production)"
+                required: true
+                default: "qa"
+            approval_required:
+                description: "Require manual approval for production"
+                type: boolean
+                default: true
+            rollback_strategy:
+                description: "Rollback strategy"
+                type: choice
+                default: "automatic"
+                options:
+                    - automatic
+                    - manual
+                    - none
+
+env:
+    RELEASE_VERSION: ${{ github.event.inputs.release_version }}
+    SOURCE_ENV: ${{ github.event.inputs.source_environment }}
+    ROLLBACK_STRATEGY: ${{ github.event.inputs.rollback_strategy }}
+
+jobs:
+    validate-inputs:
+        runs-on: ubuntu-latest
+        outputs:
+            target_matrix: ${{ steps.parse.outputs.matrix }}
+            requires_approval: ${{ steps.check.outputs.needs_approval }}
+
+        steps:
+            - name: 📋 Parse Target Environments
+              id: parse
+              run: |
+                  # Convert comma-separated string to JSON array
+                  TARGETS="${{ github.event.inputs.target_environments }}"
+                  echo "Raw targets: $TARGETS"
+
+                  # Create JSON matrix
+                  MATRIX=$(echo "$TARGETS" | sed 's/,/","/g' | sed 's/^/["/' | sed 's/$/"]/')
+                  echo "Matrix: $MATRIX"
+                  echo "matrix={\"environment\":$MATRIX}" >> $GITHUB_OUTPUT
+
+            - name: 🔍 Check Approval Requirements
+              id: check
+              run: |
+                  TARGETS="${{ github.event.inputs.target_environments }}"
+                  APPROVAL_REQUIRED="${{ github.event.inputs.approval_required }}"
+
+                  if [[ "$TARGETS" == *"production"* && "$APPROVAL_REQUIRED" == "true" ]]; then
+                    echo "needs_approval=true" >> $GITHUB_OUTPUT
+                    echo "🔒 Production deployment requires manual approval"
+                  else
+                    echo "needs_approval=false" >> $GITHUB_OUTPUT
+                    echo "✅ No approval required for this deployment"
+                  fi
+
+    deploy:
+        needs: validate-inputs
+        runs-on: ubuntu-latest
+        strategy:
+            matrix: ${{ fromJson(needs.validate-inputs.outputs.target_matrix) }}
+            fail-fast: false
+
+        environment:
+            name: ${{ matrix.environment }}
+            url: https://${{ matrix.environment }}.example.com
+
+        steps:
+            - name: 🚀 Deploy to ${{ matrix.environment }}
+              run: |
+                  echo "🎯 Starting deployment to ${{ matrix.environment }}"
+                  echo "📦 Version: ${{ env.RELEASE_VERSION }}"
+                  echo "🔄 Source: ${{ env.SOURCE_ENV }}"
+                  echo "⚖️ Rollback Strategy: ${{ env.ROLLBACK_STRATEGY }}"
+
+                  # Simulate deployment process
+                  echo "📥 Pulling artifacts from ${{ env.SOURCE_ENV }}..."
+                  sleep 2
+
+                  echo "🔧 Configuring ${{ matrix.environment }} environment..."
+                  sleep 1
+
+                  echo "🚀 Deploying version ${{ env.RELEASE_VERSION }}..."
+                  sleep 3
+
+                  echo "✅ Deployment to ${{ matrix.environment }} completed successfully!"
+
+            - name: 🔍 Health Check
+              run: |
+                  echo "🏥 Running health checks for ${{ matrix.environment }}..."
+
+                  # Simulate health check
+                  if [ "${{ matrix.environment }}" = "production" ]; then
+                    echo "🔍 Extended health check for production..."
+                    sleep 5
+                  else
+                    sleep 2
+                  fi
+
+                  echo "✅ Health check passed for ${{ matrix.environment }}"
+
+            - name: 📊 Update Deployment Status
+              run: |
+                  echo "📊 Updating deployment status..."
+                  echo "Environment: ${{ matrix.environment }}"
+                  echo "Version: ${{ env.RELEASE_VERSION }}"
+                  echo "Status: ✅ Deployed"
+                  echo "Timestamp: $(date)"
+
+    notification:
+        needs: [validate-inputs, deploy]
+        runs-on: ubuntu-latest
+        if: always()
+
+        steps:
+            - name: 📧 Send Deployment Summary
+              run: |
+                  echo "📧 Sending deployment summary notification..."
+                  echo ""
+                  echo "🚀 Multi-Environment Pipeline Summary"
+                  echo "====================================="
+                  echo "📦 Release: ${{ env.RELEASE_VERSION }}"
+                  echo "🔄 Source: ${{ env.SOURCE_ENV }}"
+                  echo "🎯 Targets: ${{ github.event.inputs.target_environments }}"
+                  echo "⚖️ Rollback: ${{ env.ROLLBACK_STRATEGY }}"
+                  echo "🔒 Approval Required: ${{ github.event.inputs.approval_required }}"
+                  echo ""
+
+                  if [ "${{ needs.deploy.result }}" = "success" ]; then
+                    echo "✅ All deployments completed successfully!"
+                  else
+                    echo "❌ Some deployments failed. Check logs for details."
+                  fi

@@ -1,0 +1,216 @@
+name: API Integration Workflow
+
+on:
+    workflow_dispatch:
+        inputs:
+            api_source:
+                description: "API Source"
+                required: true
+                type: choice
+                options:
+                    - nexus
+                    - docker-hub
+                    - github-releases
+                    - custom-api
+            api_endpoint:
+                description: "API Endpoint URL"
+                required: true
+            filter_criteria:
+                description: "Filter criteria (e.g., latest, stable, v1.*)"
+                required: false
+                default: "latest"
+            action_on_result:
+                description: "Action to take on API result"
+                required: true
+                type: choice
+                options:
+                    - deploy-latest
+                    - compare-versions
+                    - notify-only
+                    - conditional-deploy
+            webhook_url:
+                description: "Notification webhook URL (optional)"
+                required: false
+
+env:
+    API_SOURCE: ${{ github.event.inputs.api_source }}
+    API_ENDPOINT: ${{ github.event.inputs.api_endpoint }}
+    FILTER_CRITERIA: ${{ github.event.inputs.filter_criteria }}
+    ACTION: ${{ github.event.inputs.action_on_result }}
+    WEBHOOK_URL: ${{ github.event.inputs.webhook_url }}
+
+jobs:
+    fetch-api-data:
+        runs-on: ubuntu-latest
+        outputs:
+            api_result: ${{ steps.fetch.outputs.result }}
+            latest_version: ${{ steps.parse.outputs.version }}
+            should_deploy: ${{ steps.decide.outputs.deploy }}
+
+        steps:
+            - name: 🔗 Fetch Data from API
+              id: fetch
+              run: |
+                  echo "🔗 Fetching data from ${{ env.API_SOURCE }}..."
+                  echo "📡 Endpoint: ${{ env.API_ENDPOINT }}"
+                  echo "🔍 Filter: ${{ env.FILTER_CRITERIA }}"
+
+                  # Simulate API call based on source type
+                  case "${{ env.API_SOURCE }}" in
+                    "nexus")
+                      echo "📦 Fetching from Nexus Repository..."
+                      # Simulate Nexus API response
+                      RESULT='{"version":"1.2.3","artifact":"myapp-1.2.3.jar","timestamp":"2024-01-15T10:30:00Z"}'
+                      ;;
+                    "docker-hub")
+                      echo "🐳 Fetching from Docker Hub..."
+                      # Simulate Docker Hub API response
+                      RESULT='{"tag":"v1.2.3","digest":"sha256:abc123","last_updated":"2024-01-15T10:30:00Z"}'
+                      ;;
+                    "github-releases")
+                      echo "🐙 Fetching from GitHub Releases..."
+                      # Simulate GitHub API response
+                      RESULT='{"tag_name":"v1.2.3","name":"Release v1.2.3","published_at":"2024-01-15T10:30:00Z"}'
+                      ;;
+                    "custom-api")
+                      echo "🔧 Fetching from Custom API..."
+                      # Simulate custom API response
+                      RESULT='{"version":"1.2.3","status":"available","metadata":{"build":"456","branch":"main"}}'
+                      ;;
+                  esac
+
+                  echo "📊 API Response: $RESULT"
+                  echo "result=$RESULT" >> $GITHUB_OUTPUT
+
+            - name: 📊 Parse API Result
+              id: parse
+              run: |
+                  RESULT='${{ steps.fetch.outputs.result }}'
+                  echo "📊 Parsing API result..."
+
+                  # Extract version based on API source
+                  case "${{ env.API_SOURCE }}" in
+                    "nexus"|"custom-api")
+                      VERSION=$(echo "$RESULT" | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+                      ;;
+                    "docker-hub")
+                      VERSION=$(echo "$RESULT" | grep -o '"tag":"[^"]*"' | cut -d'"' -f4)
+                      ;;
+                    "github-releases")
+                      VERSION=$(echo "$RESULT" | grep -o '"tag_name":"[^"]*"' | cut -d'"' -f4)
+                      ;;
+                  esac
+
+                  echo "🏷️ Extracted Version: $VERSION"
+                  echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+            - name: 🤔 Decide Action
+              id: decide
+              run: |
+                  VERSION='${{ steps.parse.outputs.version }}'
+                  ACTION='${{ env.ACTION }}'
+
+                  echo "🤔 Deciding action based on: $ACTION"
+
+                  case "$ACTION" in
+                    "deploy-latest")
+                      echo "deploy=true" >> $GITHUB_OUTPUT
+                      echo "✅ Will deploy latest version: $VERSION"
+                      ;;
+                    "compare-versions")
+                      # Simulate version comparison
+                      echo "🔍 Comparing with current version..."
+                      echo "deploy=false" >> $GITHUB_OUTPUT
+                      echo "📊 Comparison complete - no deployment needed"
+                      ;;
+                    "notify-only")
+                      echo "deploy=false" >> $GITHUB_OUTPUT
+                      echo "📧 Notification only - no deployment"
+                      ;;
+                    "conditional-deploy")
+                      # Simulate conditional logic
+                      if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                        echo "deploy=true" >> $GITHUB_OUTPUT
+                        echo "✅ Version format valid - will deploy: $VERSION"
+                      else
+                        echo "deploy=false" >> $GITHUB_OUTPUT
+                        echo "❌ Version format invalid - skipping deployment"
+                      fi
+                      ;;
+                  esac
+
+    deploy:
+        needs: fetch-api-data
+        runs-on: ubuntu-latest
+        if: needs.fetch-api-data.outputs.should_deploy == 'true'
+
+        steps:
+            - name: 🚀 Deploy Latest Version
+              run: |
+                  VERSION='${{ needs.fetch-api-data.outputs.latest_version }}'
+                  echo "🚀 Deploying version: $VERSION"
+                  echo "📡 Source: ${{ env.API_SOURCE }}"
+                  echo "🔗 From: ${{ env.API_ENDPOINT }}"
+
+                  # Simulate deployment process
+                  echo "📥 Downloading artifact for version $VERSION..."
+                  sleep 2
+
+                  echo "🔧 Preparing deployment environment..."
+                  sleep 1
+
+                  echo "🚀 Starting deployment..."
+                  sleep 3
+
+                  echo "✅ Deployment completed successfully!"
+                  echo "🌍 Application updated to version: $VERSION"
+
+    notify:
+        needs: [fetch-api-data, deploy]
+        runs-on: ubuntu-latest
+        if: always()
+
+        steps:
+            - name: 📧 Send Notification
+              run: |
+                  echo "📧 Sending API integration notification..."
+
+                  VERSION='${{ needs.fetch-api-data.outputs.latest_version }}'
+                  DEPLOYED='${{ needs.fetch-api-data.outputs.should_deploy }}'
+
+                  echo ""
+                  echo "🔗 API Integration Summary"
+                  echo "========================="
+                  echo "📡 Source: ${{ env.API_SOURCE }}"
+                  echo "🔗 Endpoint: ${{ env.API_ENDPOINT }}"
+                  echo "🏷️ Latest Version: $VERSION"
+                  echo "🎯 Action: ${{ env.ACTION }}"
+                  echo "🚀 Deployed: $DEPLOYED"
+                  echo ""
+
+                  if [ "${{ needs.deploy.result }}" = "success" ]; then
+                    echo "✅ Integration completed successfully!"
+                  elif [ "$DEPLOYED" = "false" ]; then
+                    echo "ℹ️ No deployment triggered (by design)"
+                  else
+                    echo "❌ Integration failed. Check logs for details."
+                  fi
+
+            - name: 📡 Send Webhook Notification
+              if: env.WEBHOOK_URL != ''
+              run: |
+                  echo "📡 Sending webhook notification..."
+                  echo "🔗 Webhook URL: ${{ env.WEBHOOK_URL }}"
+
+                  # Simulate webhook call (in real scenario, use curl)
+                  echo "POST ${{ env.WEBHOOK_URL }}"
+                  echo "Content-Type: application/json"
+                  echo "{"
+                  echo '  "source": "${{ env.API_SOURCE }}",'
+                  echo '  "version": "${{ needs.fetch-api-data.outputs.latest_version }}",'
+                  echo '  "action": "${{ env.ACTION }}",'
+                  echo '  "deployed": ${{ needs.fetch-api-data.outputs.should_deploy }},'
+                  echo '  "status": "completed"'
+                  echo "}"
+
+                  echo "✅ Webhook notification sent!"

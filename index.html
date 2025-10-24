@@ -118,12 +118,62 @@
         <p class="subtitle">Trigger GitHub Actions workflows from your browser</p>
         
         <div class="info-box">
-            <strong>🚀 Advanced Workflow Configuration</strong><br>
-            This page demonstrates overcoming GitHub Actions' 10-input limitation by using JSON payloads.
-            Configure 11+ parameters below, generate a JSON payload, and trigger a reusable workflow that parses the configuration.
+            <strong>🚀 GitHub Actions Pattern Library</strong><br>
+            Choose from different workflow patterns that demonstrate overcoming GitHub's limitations.
+            Each pattern shows different approaches for complex automation scenarios.
             <br><br>
             <strong>Repository:</strong> <span id="repo-name">ElizabethMoralesO/test</span><br>
-            <strong>Benefits:</strong> ✅ 10+ inputs ✅ Dynamic configuration ✅ User-friendly UI ✅ JSON-based workflows
+            <strong>Patterns Available:</strong> ✅ Advanced JSON Config ✅ Simple Trigger ✅ Multi-Environment Deploy ✅ API Integration
+        </div>
+
+        <!-- Workflow Pattern Selector -->
+        <div class="workflow-selector" style="margin-bottom: 30px;">
+            <h3 style="color: #0969da; margin-bottom: 15px;">🎯 Select Workflow Pattern</h3>
+            
+            <div class="pattern-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                
+                <!-- Advanced JSON Pattern -->
+                <div class="pattern-card" data-pattern="advanced" style="border: 2px solid #d0d7de; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;">
+                    <h4 style="margin: 0 0 8px 0; color: #0969da;">🔧 Advanced JSON Configuration</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #656d76;">15+ inputs via JSON payload. Ideal for complex deployments.</p>
+                    <div style="font-size: 12px; color: #0969da;">
+                        <strong>Use cases:</strong> Multi-cloud deployments, complex CI/CD, enterprise configs
+                    </div>
+                </div>
+
+                <!-- Simple Trigger Pattern -->
+                <div class="pattern-card" data-pattern="simple" style="border: 2px solid #d0d7de; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;">
+                    <h4 style="margin: 0 0 8px 0; color: #0969da;">⚡ Simple Workflow Trigger</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #656d76;">Basic workflow with message and environment selection.</p>
+                    <div style="font-size: 12px; color: #0969da;">
+                        <strong>Use cases:</strong> Quick deployments, testing, demos, simple automation
+                    </div>
+                </div>
+
+                <!-- Multi-Environment Pattern -->
+                <div class="pattern-card" data-pattern="multi-env" style="border: 2px solid #d0d7de; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;">
+                    <h4 style="margin: 0 0 8px 0; color: #0969da;">🌍 Multi-Environment Pipeline</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #656d76;">Deploy across multiple environments with approval gates.</p>
+                    <div style="font-size: 12px; color: #0969da;">
+                        <strong>Use cases:</strong> Progressive deployments, staging pipelines, release management
+                    </div>
+                </div>
+
+                <!-- API Integration Pattern -->
+                <div class="pattern-card" data-pattern="api-integration" style="border: 2px solid #d0d7de; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;">
+                    <h4 style="margin: 0 0 8px 0; color: #0969da;">🔗 API Integration Workflow</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #656d76;">Fetch data from external APIs and trigger based on results.</p>
+                    <div style="font-size: 12px; color: #0969da;">
+                        <strong>Use cases:</strong> Nexus artifacts, Docker registry, infrastructure APIs
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="selected-pattern-info" id="selected-pattern-info" style="background: #dafbe1; border: 1px solid #2da44e; border-radius: 6px; padding: 15px; display: none;">
+                <strong>Selected Pattern:</strong> <span id="selected-pattern-name"></span><br>
+                <span id="selected-pattern-description"></span>
+            </div>
         </div>
 
         <!-- Advanced Configuration Form (11+ Inputs) -->
@@ -283,22 +333,98 @@
     <script>
         const REPO_OWNER = 'ElizabethMoralesO';
         const REPO_NAME = 'test';
-        const WEB_TRIGGER_WORKFLOW = 'web-trigger.yaml';
+        
+        // Available workflow patterns
+        const WORKFLOW_PATTERNS = {
+            'advanced': {
+                name: 'Advanced JSON Configuration',
+                workflow: 'advanced-workflow.yaml',
+                description: 'Complex deployment configuration with 15+ inputs via JSON payload'
+            },
+            'simple': {
+                name: 'Simple Workflow Trigger',
+                workflow: 'dummy-workflow.yaml',
+                description: 'Basic workflow trigger with message and environment selection'
+            },
+            'multi-env': {
+                name: 'Multi-Environment Pipeline',
+                workflow: 'multi-env-workflow.yaml',
+                description: 'Progressive deployment across multiple environments with approval gates'
+            },
+            'api-integration': {
+                name: 'API Integration Workflow',
+                workflow: 'api-integration-workflow.yaml',
+                description: 'Fetch external data and trigger workflows based on API responses'
+            }
+        };
+        
+        let selectedPattern = 'advanced'; // Default pattern
 
         // Setup event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('triggerForm').addEventListener('submit', handleWorkflowTrigger);
-            
-            // Add real-time JSON preview updates
-            const formInputs = document.querySelectorAll('#triggerForm input, #triggerForm select, #triggerForm textarea');
-            formInputs.forEach(input => {
-                input.addEventListener('input', updateJSONPreview);
-                input.addEventListener('change', updateJSONPreview);
+            // Pattern selection
+            const patternCards = document.querySelectorAll('.pattern-card');
+            patternCards.forEach(card => {
+                card.addEventListener('click', () => selectPattern(card.dataset.pattern));
             });
             
-            // Initial JSON preview
-            updateJSONPreview();
+            // Form submission
+            document.getElementById('triggerForm').addEventListener('submit', handleWorkflowTrigger);
+            
+            // Add real-time JSON preview updates for advanced pattern
+            const formInputs = document.querySelectorAll('#triggerForm input, #triggerForm select, #triggerForm textarea');
+            formInputs.forEach(input => {
+                input.addEventListener('input', updateDisplay);
+                input.addEventListener('change', updateDisplay);
+            });
+            
+            // Initialize with default pattern
+            selectPattern(selectedPattern);
         });
+
+        // Select workflow pattern
+        function selectPattern(patternId) {
+            selectedPattern = patternId;
+            const pattern = WORKFLOW_PATTERNS[patternId];
+            
+            // Update visual selection
+            document.querySelectorAll('.pattern-card').forEach(card => {
+                if (card.dataset.pattern === patternId) {
+                    card.style.border = '2px solid #2da44e';
+                    card.style.backgroundColor = '#dafbe1';
+                } else {
+                    card.style.border = '2px solid #d0d7de';
+                    card.style.backgroundColor = 'white';
+                }
+            });
+            
+            // Show selected pattern info
+            document.getElementById('selected-pattern-info').style.display = 'block';
+            document.getElementById('selected-pattern-name').textContent = pattern.name;
+            document.getElementById('selected-pattern-description').textContent = pattern.description;
+            
+            // Show appropriate form
+            showFormForPattern(patternId);
+        }
+
+        // Show appropriate form based on pattern
+        function showFormForPattern(patternId) {
+            const formContainer = document.getElementById('triggerForm');
+            
+            if (patternId === 'advanced') {
+                // Advanced form is already in HTML, just make sure it's visible
+                showAdvancedForm();
+            } else if (patternId === 'simple') {
+                showSimpleForm();
+            } else if (patternId === 'multi-env') {
+                showMultiEnvForm();
+            } else if (patternId === 'api-integration') {
+                showApiIntegrationForm();
+            }
+            
+            // Update display after form change
+            updateDisplay();
+        }
 
         // Update JSON preview in real-time
         function updateJSONPreview() {
@@ -352,30 +478,173 @@
             }
         }
 
+        // Show different forms based on pattern
+        function showAdvancedForm() {
+            // Advanced form is already in HTML - this function ensures it's properly displayed
+            updateJSONPreview();
+        }
+
+        function showSimpleForm() {
+            const formContainer = document.getElementById('triggerForm');
+            formContainer.innerHTML = `
+                <h3>⚡ Simple Workflow Trigger</h3>
+                <div class="form-group">
+                    <label for="simple-message">Message:</label>
+                    <textarea id="simple-message" placeholder="Enter a message for the workflow...">Hello from Simple Trigger! 👋</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="simple-environment">Environment:</label>
+                    <select id="simple-environment">
+                        <option value="development">Development</option>
+                        <option value="staging">Staging</option>
+                        <option value="production">Production</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" id="triggerBtn">
+                    ⚡ Trigger Simple Workflow
+                </button>
+            `;
+        }
+
+        function showMultiEnvForm() {
+            const formContainer = document.getElementById('triggerForm');
+            formContainer.innerHTML = `
+                <h3>🌍 Multi-Environment Pipeline</h3>
+                <div class="form-group">
+                    <label for="release-version">Release Version:</label>
+                    <input type="text" id="release-version" placeholder="v1.0.0" required>
+                </div>
+                <div class="form-group">
+                    <label for="source-environment">Source Environment:</label>
+                    <select id="source-environment" required>
+                        <option value="development">Development</option>
+                        <option value="staging">Staging</option>
+                        <option value="production">Production</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="target-environments">Target Environments:</label>
+                    <div style="margin: 8px 0;">
+                        <label><input type="checkbox" value="qa" style="width: auto; margin-right: 8px;"> QA Environment</label><br>
+                        <label><input type="checkbox" value="staging" style="width: auto; margin-right: 8px;"> Staging Environment</label><br>
+                        <label><input type="checkbox" value="production" style="width: auto; margin-right: 8px;"> Production Environment</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="approval-required">
+                        <input type="checkbox" id="approval-required" style="width: auto; margin-right: 8px;">
+                        Require Manual Approval for Production
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="rollback-strategy">Rollback Strategy:</label>
+                    <select id="rollback-strategy">
+                        <option value="automatic">Automatic on Failure</option>
+                        <option value="manual">Manual Only</option>
+                        <option value="none">No Rollback</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" id="triggerBtn">
+                    🌍 Start Multi-Environment Pipeline
+                </button>
+            `;
+        }
+
+        function showApiIntegrationForm() {
+            const formContainer = document.getElementById('triggerForm');
+            formContainer.innerHTML = `
+                <h3>🔗 API Integration Workflow</h3>
+                <div class="form-group">
+                    <label for="api-source">API Source:</label>
+                    <select id="api-source" required>
+                        <option value="nexus">Nexus Repository</option>
+                        <option value="docker-hub">Docker Hub</option>
+                        <option value="github-releases">GitHub Releases</option>
+                        <option value="custom-api">Custom API</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="api-endpoint">API Endpoint:</label>
+                    <input type="text" id="api-endpoint" placeholder="https://api.example.com/artifacts" required>
+                </div>
+                <div class="form-group">
+                    <label for="filter-criteria">Filter Criteria:</label>
+                    <input type="text" id="filter-criteria" placeholder="latest, stable, v1.*">
+                </div>
+                <div class="form-group">
+                    <label for="action-on-result">Action on API Result:</label>
+                    <select id="action-on-result" required>
+                        <option value="deploy-latest">Deploy Latest Version</option>
+                        <option value="compare-versions">Compare with Current</option>
+                        <option value="notify-only">Notification Only</option>
+                        <option value="conditional-deploy">Conditional Deployment</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="webhook-url">Notification Webhook (Optional):</label>
+                    <input type="url" id="webhook-url" placeholder="https://hooks.slack.com/...">
+                </div>
+                <button type="submit" class="btn" id="triggerBtn">
+                    🔗 Start API Integration Workflow
+                </button>
+            `;
+        }
+
+        // Update display based on selected pattern
+        function updateDisplay() {
+            if (selectedPattern === 'advanced') {
+                updateJSONPreview();
+            }
+            // Other patterns don't need real-time preview updates
+        }
+
         // Handle workflow trigger
         async function handleWorkflowTrigger(e) {
             e.preventDefault();
             
-            const config = collectFormData();
             const triggerBtn = document.getElementById('triggerBtn');
-            
-            // Validate required fields
-            if (!config.application.name || !config.deployment.version) {
-                showMessage('error', '❌ Please fill in all required fields (Application Name, Version)');
-                return;
-            }
+            const pattern = WORKFLOW_PATTERNS[selectedPattern];
             
             // Reset status and disable button
             hideMessage();
             triggerBtn.disabled = true;
-            triggerBtn.textContent = '🔄 Generating JSON payload...';
             
-            // Generate the configuration and redirect to GitHub Actions
-            redirectToGitHubActions(config);
+            if (selectedPattern === 'advanced') {
+                const config = collectFormData();
+                
+                // Validate required fields
+                if (!config.application.name || !config.deployment.version) {
+                    showMessage('error', '❌ Please fill in all required fields (Application Name, Version)');
+                    triggerBtn.disabled = false;
+                    return;
+                }
+                
+                triggerBtn.textContent = '🔄 Generating JSON payload...';
+                redirectToGitHubActions(config, pattern.workflow);
+                
+            } else if (selectedPattern === 'simple') {
+                triggerBtn.textContent = '🔄 Triggering simple workflow...';
+                const message = document.getElementById('simple-message').value;
+                const environment = document.getElementById('simple-environment').value;
+                redirectToSimpleWorkflow(message, environment, pattern.workflow);
+                
+            } else if (selectedPattern === 'multi-env') {
+                triggerBtn.textContent = '🔄 Starting pipeline...';
+                const config = collectMultiEnvData();
+                redirectToMultiEnvWorkflow(config, pattern.workflow);
+                
+            } else if (selectedPattern === 'api-integration') {
+                triggerBtn.textContent = '🔄 Configuring API integration...';
+                const config = collectApiIntegrationData();
+                redirectToApiIntegrationWorkflow(config, pattern.workflow);
+            }
             
-            // Re-enable button
-            triggerBtn.disabled = false;
-            triggerBtn.textContent = '🎯 Generate JSON & Trigger Advanced Workflow';
+            // Re-enable button after delay
+            setTimeout(() => {
+                triggerBtn.disabled = false;
+                const originalText = triggerBtn.textContent.replace('🔄 ', '🎯 ').replace('...', '');
+                triggerBtn.textContent = originalText;
+            }, 3000);
         }
 
         // Direct user to GitHub Actions page to trigger workflow with JSON payload
@@ -425,6 +694,96 @@
             setTimeout(() => {
                 window.open(actionsUrl, '_blank');
             }, 3000);
+        }
+
+        // Collect data for multi-environment workflow
+        function collectMultiEnvData() {
+            const targets = [];
+            document.querySelectorAll('input[type="checkbox"][value]').forEach(cb => {
+                if (cb.checked) targets.push(cb.value);
+            });
+            
+            return {
+                release_version: document.getElementById('release-version').value,
+                source_environment: document.getElementById('source-environment').value,
+                target_environments: targets.join(','),
+                approval_required: document.getElementById('approval-required').checked,
+                rollback_strategy: document.getElementById('rollback-strategy').value
+            };
+        }
+
+        // Collect data for API integration workflow
+        function collectApiIntegrationData() {
+            return {
+                api_source: document.getElementById('api-source').value,
+                api_endpoint: document.getElementById('api-endpoint').value,
+                filter_criteria: document.getElementById('filter-criteria').value || 'latest',
+                action_on_result: document.getElementById('action-on-result').value,
+                webhook_url: document.getElementById('webhook-url').value || ''
+            };
+        }
+
+        // Redirect to simple workflow
+        function redirectToSimpleWorkflow(message, environment, workflowFile) {
+            const repoOwner = 'YOUR_USERNAME'; // Replace with your actual GitHub username
+            const repoName = 'YOUR_REPOSITORY'; // Replace with your actual repository name
+            
+            const dispatchUrl = `https://github.com/${repoOwner}/${repoName}/actions/workflows/${workflowFile}`;
+            
+            showMessage('success', `
+                ✅ Simple workflow ready to trigger!<br><br>
+                <strong>Configuration:</strong><br>
+                • Message: ${message}<br>
+                • Environment: ${environment}<br><br>
+                You'll be redirected to GitHub Actions to run the workflow...
+            `);
+            
+            setTimeout(() => {
+                window.open(dispatchUrl, '_blank');
+            }, 2000);
+        }
+
+        // Redirect to multi-environment workflow
+        function redirectToMultiEnvWorkflow(config, workflowFile) {
+            const repoOwner = 'YOUR_USERNAME'; // Replace with your actual GitHub username
+            const repoName = 'YOUR_REPOSITORY'; // Replace with your actual repository name
+            
+            const dispatchUrl = `https://github.com/${repoOwner}/${repoName}/actions/workflows/${workflowFile}`;
+            
+            showMessage('success', `
+                ✅ Multi-environment pipeline configured!<br><br>
+                <strong>Configuration:</strong><br>
+                • Release: ${config.release_version}<br>
+                • From: ${config.source_environment}<br>
+                • To: ${config.target_environments || 'None selected'}<br>
+                • Approval Required: ${config.approval_required ? 'Yes' : 'No'}<br><br>
+                You'll be redirected to GitHub Actions...
+            `);
+            
+            setTimeout(() => {
+                window.open(dispatchUrl, '_blank');
+            }, 2000);
+        }
+
+        // Redirect to API integration workflow
+        function redirectToApiIntegrationWorkflow(config, workflowFile) {
+            const repoOwner = 'YOUR_USERNAME'; // Replace with your actual GitHub username
+            const repoName = 'YOUR_REPOSITORY'; // Replace with your actual repository name
+            
+            const dispatchUrl = `https://github.com/${repoOwner}/${repoName}/actions/workflows/${workflowFile}`;
+            
+            showMessage('success', `
+                ✅ API integration workflow configured!<br><br>
+                <strong>Configuration:</strong><br>
+                • API Source: ${config.api_source}<br>
+                • Endpoint: ${config.api_endpoint}<br>
+                • Action: ${config.action_on_result}<br><br>
+                You'll be redirected to GitHub Actions...
+            `);
+            
+            setTimeout(() => {
+                window.open(dispatchUrl, '_blank');
+            }, 2000);
         }
 
         // Utility functions
