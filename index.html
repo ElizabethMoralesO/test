@@ -387,12 +387,7 @@
                 `;
             }
             
-            // Select default pattern
-            selectPattern('advanced');
         }
-        
-        // Call initialization when page loads
-        document.addEventListener('DOMContentLoaded', initializePage);
         
         // Available workflow patterns
         const WORKFLOW_PATTERNS = {
@@ -422,10 +417,17 @@
 
         // Setup event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded');
             // Pattern selection
             const patternCards = document.querySelectorAll('.pattern-card');
+            console.log('📋 Found pattern cards:', patternCards.length);
             patternCards.forEach(card => {
-                card.addEventListener('click', () => selectPattern(card.dataset.pattern));
+                console.log('🎯 Adding click listener to:', card.dataset.pattern);
+                card.addEventListener('click', () => {
+                    console.log('🖱️ Card clicked:', card.dataset.pattern);
+                    alert('Selected: ' + card.dataset.pattern); // Temporary debugging
+                    selectPattern(card.dataset.pattern);
+                });
             });
             
             // Form submission
@@ -438,14 +440,19 @@
                 input.addEventListener('change', updateDisplay);
             });
             
+            // Initialize page content
+            initializePage();
+            
             // Initialize with default pattern
             selectPattern(selectedPattern);
         });
 
         // Select workflow pattern
         function selectPattern(patternId) {
+            console.log('🔥 selectPattern called with:', patternId);
             selectedPattern = patternId;
             const pattern = WORKFLOW_PATTERNS[patternId];
+            console.log('📋 Pattern found:', pattern);
             
             // Update visual selection
             document.querySelectorAll('.pattern-card').forEach(card => {
@@ -469,17 +476,22 @@
 
         // Show appropriate form based on pattern
         function showFormForPattern(patternId) {
+            console.log('🎯 showFormForPattern called with:', patternId);
             const formContainer = document.getElementById('triggerForm');
             
             if (patternId === 'advanced') {
+                console.log('📋 Showing advanced form');
                 // Advanced form is already in HTML, just make sure it's visible
                 showAdvancedForm();
             } else if (patternId === 'simple') {
+                console.log('🚀 Redirecting to simple workflow');
                 // Simple workflow - redirect directly to GitHub Actions
                 redirectToSimpleWorkflow();
             } else if (patternId === 'multi-env') {
+                console.log('🌍 Showing multi-env form');
                 showMultiEnvForm();
             } else if (patternId === 'api-integration') {
+                console.log('🔗 Showing API integration form');
                 showApiIntegrationForm();
             }
             
