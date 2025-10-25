@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workflow Trigger - GitHub Pages</title>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -297,6 +294,11 @@
                 </div>
             
                 <div class="form-group">
+                    <label for="customEnvVars">Custom Environment Variables (JSON):</label>
+                    <textarea id="customEnvVars" name="customEnvVars" placeholder='{"KEY1": "value1", "KEY2": "value2"}' rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
                     <label for="deploymentNotes">Deployment Notes:</label>
                     <textarea id="deploymentNotes" name="deploymentNotes" placeholder="Enter any special notes for this deployment..." rows="3"></textarea>
                 </div>
@@ -362,21 +364,9 @@
         }
         
         const { owner: REPO_OWNER, repo: REPO_NAME } = getRepoInfo();
-        console.log(`🔍 Auto-detected repository: ${REPO_OWNER}/${REPO_NAME}`);
         
         // Initialize page with auto-detected repository info
         function initializePage() {
-            // Update repository display
-            const repoNameElement = document.getElementById('repo-name');
-            if (repoNameElement) {
-                repoNameElement.textContent = `${REPO_OWNER}/${REPO_NAME}`;
-                repoNameElement.style.fontFamily = 'monospace';
-                repoNameElement.style.background = '#f6f8fa';
-                repoNameElement.style.padding = '2px 6px';
-                repoNameElement.style.borderRadius = '3px';
-                repoNameElement.style.fontSize = '14px';
-            }
-            
             // Update dynamic links
             const linksContainer = document.getElementById('dynamic-links');
             if (linksContainer) {
@@ -394,22 +384,30 @@
             'advanced': {
                 name: 'Advanced JSON Configuration',
                 workflow: 'advanced-workflow.yaml',
-                description: 'Complex deployment configuration with 15+ inputs via JSON payload'
+                description: 'Complex deployment configuration with 15+ inputs via JSON payload',
+                inputCount: 15,
+                useForm: true
             },
             'simple': {
                 name: 'Simple Workflow Trigger',
                 workflow: 'simple-workflow.yaml',
-                description: 'Basic workflow trigger with message and environment selection'
+                description: 'Basic workflow trigger with message and environment selection',
+                inputCount: 2,
+                useForm: false
             },
             'multi-env': {
                 name: 'Multi-Environment Pipeline',
                 workflow: 'multi-env-workflow.yaml',
-                description: 'Progressive deployment across multiple environments with approval gates'
+                description: 'Progressive deployment across multiple environments with approval gates',
+                inputCount: 5,
+                useForm: true
             },
             'api-integration': {
                 name: 'API Integration Workflow',
                 workflow: 'api-integration-workflow.yaml',
-                description: 'Fetch external data and trigger workflows based on API responses'
+                description: 'Fetch external data and trigger workflows based on API responses',
+                inputCount: 5,
+                useForm: true
             }
         };
         
@@ -417,15 +415,10 @@
 
         // Setup event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM Content Loaded');
             // Pattern selection
             const patternCards = document.querySelectorAll('.pattern-card');
-            console.log('📋 Found pattern cards:', patternCards.length);
             patternCards.forEach(card => {
-                console.log('🎯 Adding click listener to:', card.dataset.pattern);
                 card.addEventListener('click', () => {
-                    console.log('🖱️ Card clicked:', card.dataset.pattern);
-                    alert('Selected: ' + card.dataset.pattern); // Temporary debugging
                     selectPattern(card.dataset.pattern);
                 });
             });
@@ -449,10 +442,8 @@
 
         // Select workflow pattern
         function selectPattern(patternId) {
-            console.log('🔥 selectPattern called with:', patternId);
             selectedPattern = patternId;
             const pattern = WORKFLOW_PATTERNS[patternId];
-            console.log('📋 Pattern found:', pattern);
             
             // Update visual selection
             document.querySelectorAll('.pattern-card').forEach(card => {
@@ -465,34 +456,35 @@
                 }
             });
             
-            // Show selected pattern info
-            document.getElementById('selected-pattern-info').style.display = 'block';
-            document.getElementById('selected-pattern-name').textContent = pattern.name;
-            document.getElementById('selected-pattern-description').textContent = pattern.description;
-            
-            // Show appropriate form
+            // Show appropriate form or redirect
             showFormForPattern(patternId);
         }
 
         // Show appropriate form based on pattern
         function showFormForPattern(patternId) {
-            console.log('🎯 showFormForPattern called with:', patternId);
             const formContainer = document.getElementById('triggerForm');
+            const pattern = WORKFLOW_PATTERNS[patternId];
             
-            if (patternId === 'advanced') {
-                console.log('📋 Showing advanced form');
-                // Advanced form is already in HTML, just make sure it's visible
-                showAdvancedForm();
-            } else if (patternId === 'simple') {
-                console.log('🚀 Redirecting to simple workflow');
-                // Simple workflow - redirect directly to GitHub Actions
-                redirectToSimpleWorkflow();
-            } else if (patternId === 'multi-env') {
-                console.log('🌍 Showing multi-env form');
-                showMultiEnvForm();
-            } else if (patternId === 'api-integration') {
-                console.log('🔗 Showing API integration form');
-                showApiIntegrationForm();
+            // Decision logic: Use form if more than 10 inputs, redirect if 10 or fewer
+            if (pattern.inputCount > 10 || pattern.useForm) {
+                formContainer.style.display = 'block';
+                
+                if (patternId === 'advanced') {
+                    showAdvancedForm();
+                } else if (patternId === 'multi-env') {
+                    showMultiEnvForm();
+                } else if (patternId === 'api-integration') {
+                    showApiIntegrationForm();
+                }
+            } else {
+                formContainer.style.display = 'none';
+                
+                if (patternId === 'simple') {
+                    redirectToSimpleWorkflow();
+                } else {
+                    // Generic redirect for other simple workflows
+                    redirectToWorkflow(patternId);
+                }
             }
             
             // Update display after form change
@@ -757,12 +749,10 @@
             
             // Copy JSON to clipboard for easy pasting
             navigator.clipboard.writeText(jsonPayload).then(() => {
-                console.log('✅ JSON configuration copied to clipboard');
                 // Update button text temporarily to show copy success
                 triggerBtn.textContent = '📋 JSON Copied! Opening GitHub...';
                 triggerBtn.style.background = '#2da44e';
             }).catch(err => {
-                console.log('Could not copy to clipboard:', err);
                 // Fallback copy method
                 const textArea = document.createElement('textarea');
                 textArea.value = jsonPayload;
@@ -808,30 +798,43 @@
             };
         }
 
-        // Direct redirect to simple workflow (no form needed)
-        function redirectToSimpleWorkflow() {
-            console.log('🔥 redirectToSimpleWorkflow called');
-            alert('🔥 redirectToSimpleWorkflow called');
-            
-            const pattern = WORKFLOW_PATTERNS['simple'];
-            console.log('📋 Pattern:', pattern);
-            
+        // Generic redirect to workflow
+        function redirectToWorkflow(patternId) {
+            const pattern = WORKFLOW_PATTERNS[patternId];
             const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${pattern.workflow}`;
-            console.log('🔗 Dispatch URL:', dispatchUrl);
-            alert('🔗 Will redirect to: ' + dispatchUrl);
             
             showMessage('success', `
-                🚀 Redirecting to Simple Workflow!<br><br>
+                🚀 <strong>Redirecting to ${pattern.name}!</strong><br><br>
                 <strong>Why no form?</strong><br>
-                The simple workflow only has 2 basic inputs (message & environment) that are easier to fill directly in GitHub Actions.<br><br>
-                You'll be redirected now...
+                This workflow has ${pattern.inputCount} inputs, which is simple enough to fill directly in GitHub Actions.<br><br>
+                <a href="${dispatchUrl}" target="_blank" class="btn" style="color: white; text-decoration: none; display: inline-block; margin: 10px 0;">
+                    ⚡ Open ${pattern.name} in GitHub Actions
+                </a><br>
+                <small>You can also wait 3 seconds for automatic redirect...</small>
             `);
             
             setTimeout(() => {
-                console.log('⏰ Timeout fired, opening window');
-                alert('⏰ About to open: ' + dispatchUrl);
                 window.open(dispatchUrl, '_blank');
-            }, 1500);
+            }, 3000);
+        }
+
+        // Direct redirect to simple workflow (no form needed)
+        function redirectToSimpleWorkflow() {
+            const pattern = WORKFLOW_PATTERNS['simple'];
+            const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${pattern.workflow}`;
+            
+            showMessage('success', `
+                🚀 <strong>Redirecting to Simple Workflow!</strong>
+                <a href="${dispatchUrl}" target="_blank" class="btn" style="color: white; text-decoration: none; display: inline-block; margin: 10px 0;">
+                    ⚡ Open Simple Workflow in GitHub Actions
+                </a><br>
+                <small>You can also wait 3 seconds for automatic redirect...</small>
+            `);
+            
+            
+            setTimeout(() => {
+                window.open(dispatchUrl, '_blank');
+            }, 3000);
         }
 
         // Redirect to simple workflow (with parameters - used by form submission)
@@ -926,8 +929,6 @@
                     copyBtn.innerHTML = originalText;
                     copyBtn.style.background = '#0969da';
                 }, 2000);
-                
-                console.log('✅ JSON configuration copied to clipboard');
             }).catch(err => {
                 // Fallback for older browsers
                 const textArea = document.createElement('textarea');
@@ -950,8 +951,6 @@
                     copyBtn.innerHTML = originalText;
                     copyBtn.style.background = '#0969da';
                 }, 2000);
-                
-                console.log('✅ JSON configuration copied to clipboard (fallback method)');
             });
         }
     </script>
