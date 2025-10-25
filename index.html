@@ -129,21 +129,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Workflow Trigger</h1>
+        <h1>🚀 Workflows</h1>
         <p class="subtitle">Trigger GitHub Actions workflows from your browser</p>
         
-        <div class="info-box">
-            <strong>🚀 GitHub Actions Pattern Library</strong><br>
-            Choose from different workflow patterns that demonstrate overcoming GitHub's limitations.
-            Each pattern shows different approaches for complex automation scenarios.
-            <br><br>
-            <strong>Repository:</strong> <span id="repo-name">ElizabethMoralesO/test</span><br>
-            <strong>Patterns Available:</strong> ✅ Advanced JSON Config ✅ Simple Trigger ✅ Multi-Environment Deploy ✅ API Integration
-        </div>
-
         <!-- Workflow Pattern Selector -->
         <div class="workflow-selector" style="margin-bottom: 30px;">
-            <h3 style="color: #0969da; margin-bottom: 15px;">🎯 Select Workflow Pattern</h3>
+            <h3 style="color: #07284f; margin-bottom: 15px;">🎯 Select workflow to run</h3>
             
             <div class="pattern-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px;">
                 
@@ -185,10 +176,6 @@
                 
             </div>
             
-            <div class="selected-pattern-info" id="selected-pattern-info" style="background: #dafbe1; border: 1px solid #2da44e; border-radius: 6px; padding: 15px; display: none;">
-                <strong>Selected Pattern:</strong> <span id="selected-pattern-name"></span><br>
-                <span id="selected-pattern-description"></span>
-            </div>
         </div>
 
         <!-- Advanced Configuration Form (11+ Inputs) -->
@@ -308,12 +295,7 @@
                         Enable Monitoring & Alerting
                     </label>
                 </div>
-                
-                <div class="form-group">
-                    <label for="customEnvVars">Custom Environment Variables (JSON):</label>
-                    <textarea id="customEnvVars" name="customEnvVars" placeholder='{"NODE_ENV": "production", "LOG_LEVEL": "info"}' rows="3"></textarea>
-                </div>
-                
+            
                 <div class="form-group">
                     <label for="deploymentNotes">Deployment Notes:</label>
                     <textarea id="deploymentNotes" name="deploymentNotes" placeholder="Enter any special notes for this deployment..." rows="3"></textarea>
@@ -493,7 +475,8 @@
                 // Advanced form is already in HTML, just make sure it's visible
                 showAdvancedForm();
             } else if (patternId === 'simple') {
-                showSimpleForm();
+                // Simple workflow - redirect directly to GitHub Actions
+                redirectToSimpleWorkflow();
             } else if (patternId === 'multi-env') {
                 showMultiEnvForm();
             } else if (patternId === 'api-integration') {
@@ -704,7 +687,7 @@
                 triggerBtn.textContent = '🔄 Triggering simple workflow...';
                 const message = document.getElementById('simple-message').value;
                 const environment = document.getElementById('simple-environment').value;
-                redirectToSimpleWorkflow(message, environment, pattern.workflow);
+                redirectToSimpleWorkflowWithParams(message, environment, pattern.workflow);
                 
             } else if (selectedPattern === 'multi-env') {
                 triggerBtn.textContent = '🔄 Starting pipeline...';
@@ -742,30 +725,42 @@
                 ⚖️ Scale: ${config.deployment.replicas} replicas (${config.application.resources})<br>
                 📊 Total Inputs: ${config.metadata.totalInputs} (exceeds GitHub's 10-input limit!)<br><br>
                 
-                <details style="margin: 10px 0;">
-                    <summary style="cursor: pointer; font-weight: bold;">📋 View Complete JSON Payload</summary>
-                    <pre style="background: #f6f8fa; padding: 10px; border-radius: 4px; font-size: 11px; max-height: 200px; overflow-y: auto; margin: 10px 0;">${jsonPayload}</pre>
-                </details>
-                
                 <a href="${actionsUrl}" target="_blank" class="btn" style="color: white; text-decoration: none; display: inline-block; margin: 10px 0;">
                     🚀 Trigger Advanced Workflow in GitHub Actions
                 </a><br>
                 
                 <small>
-                <strong>Next Steps:</strong><br>
-                1. Click the button above to open GitHub Actions<br>
-                2. Click "Run workflow" button<br>
-                3. Paste the JSON configuration into the workflow input<br>
-                4. The reusable workflow will parse this JSON to generate dynamic matrices and variables<br>
-                5. This overcomes GitHub's 10-input limitation! 🎉
+                <div style="background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; padding: 8px; margin: 8px 0; text-align: center;">
+                    📋 <strong>JSON Already Copied to Clipboard!</strong><br>
+                    <small>Just paste (Ctrl+V) when GitHub opens</small>
+                </div>
+                <strong>Super Simple Steps:</strong><br>
+                1. ✅ JSON is already copied to your clipboard<br>
+                2. 🚀 Click button above to open GitHub Actions<br>
+                3. ▶️ Click "Run workflow" button<br>
+                4. 📋 Paste (Ctrl+V) in the JSON Configuration field<br>
+                5. 🎯 Click "Run workflow" to start!
                 </small>
             `);
             
             // Copy JSON to clipboard for easy pasting
             navigator.clipboard.writeText(jsonPayload).then(() => {
-                console.log('JSON configuration copied to clipboard');
+                console.log('✅ JSON configuration copied to clipboard');
+                // Update button text temporarily to show copy success
+                triggerBtn.textContent = '📋 JSON Copied! Opening GitHub...';
+                triggerBtn.style.background = '#2da44e';
             }).catch(err => {
                 console.log('Could not copy to clipboard:', err);
+                // Fallback copy method
+                const textArea = document.createElement('textarea');
+                textArea.value = jsonPayload;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                triggerBtn.textContent = '📋 JSON Copied! Opening GitHub...';
+                triggerBtn.style.background = '#2da44e';
             });
             
             // Auto-open GitHub Actions page
@@ -801,8 +796,25 @@
             };
         }
 
-        // Redirect to simple workflow
-        function redirectToSimpleWorkflow(message, environment, workflowFile) {
+        // Direct redirect to simple workflow (no form needed)
+        function redirectToSimpleWorkflow() {
+            const pattern = workflowPatterns.find(p => p.id === 'simple');
+            const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${pattern.workflow}`;
+            
+            showMessage('success', `
+                🚀 Redirecting to Simple Workflow!<br><br>
+                <strong>Why no form?</strong><br>
+                The simple workflow only has 2 basic inputs (message & environment) that are easier to fill directly in GitHub Actions.<br><br>
+                You'll be redirected now...
+            `);
+            
+            setTimeout(() => {
+                window.open(dispatchUrl, '_blank');
+            }, 1500);
+        }
+
+        // Redirect to simple workflow (with parameters - used by form submission)
+        function redirectToSimpleWorkflowWithParams(message, environment, workflowFile) {
             const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${workflowFile}`;
             
             showMessage('success', `

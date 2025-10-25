@@ -4,7 +4,7 @@ on:
     workflow_dispatch:
         inputs:
             config_json:
-                description: "JSON Configuration (generated from GitHub Pages)"
+                description: "JSON Configuration (copy from GitHub Pages)"
                 required: true
                 type: string
                 default: |
@@ -34,19 +34,10 @@ on:
                       }
                     }
 
-    # Can also be triggered by other workflows (reusable workflow pattern)
-    workflow_call:
-        inputs:
-            config_json:
-                description: "JSON Configuration"
-                required: true
-                type: string
-
 jobs:
     parse-configuration:
         runs-on: ubuntu-latest
         outputs:
-            # Parse JSON and create outputs for other jobs to consume
             environment: ${{ steps.parse.outputs.environment }}
             region: ${{ steps.parse.outputs.region }}
             app_name: ${{ steps.parse.outputs.app_name }}
@@ -62,11 +53,9 @@ jobs:
               run: |
                   echo "🔍 Parsing JSON configuration..."
 
-                  # Parse the JSON input
                   CONFIG='${{ inputs.config_json }}'
                   echo "Received config: $CONFIG"
 
-                  # Extract values using jq
                   ENVIRONMENT=$(echo "$CONFIG" | jq -r '.deployment.environment // "development"')
                   REGION=$(echo "$CONFIG" | jq -r '.deployment.region // "us-east-1"')
                   VERSION=$(echo "$CONFIG" | jq -r '.deployment.version // "latest"')
@@ -127,7 +116,6 @@ jobs:
                   echo "⚖️ Resources: $RESOURCES profile with $REPLICAS replicas"
                   echo "🔧 Logging: $ENABLE_LOGGING | Monitoring: $ENABLE_MONITORING"
 
-    # Example job that uses the parsed configuration
     deploy-application:
         needs: parse-configuration
         runs-on: ubuntu-latest
@@ -154,7 +142,6 @@ jobs:
                   sleep 2
                   echo "✅ Deployment completed successfully!"
 
-    # Example database setup job using matrix strategy
     setup-database:
         needs: parse-configuration
         runs-on: ubuntu-latest
@@ -179,7 +166,6 @@ jobs:
                   sleep 2
                   echo "✅ Database setup completed!"
 
-    # Example job demonstrating custom environment variables
     configure-environment:
         needs: parse-configuration
         runs-on: ubuntu-latest
@@ -196,7 +182,6 @@ jobs:
                   # In a real scenario, you would apply these to your deployment
                   echo "✅ Environment configuration applied!"
 
-    # Summary job that demonstrates the power of this approach
     deployment-summary:
         needs:
             [
