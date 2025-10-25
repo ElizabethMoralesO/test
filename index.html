@@ -798,7 +798,7 @@
 
         // Direct redirect to simple workflow (no form needed)
         function redirectToSimpleWorkflow() {
-            const pattern = workflowPatterns.find(p => p.id === 'simple');
+            const pattern = WORKFLOW_PATTERNS['simple'];
             const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${pattern.workflow}`;
             
             showMessage('success', `
