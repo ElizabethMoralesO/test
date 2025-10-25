@@ -810,8 +810,15 @@
 
         // Direct redirect to simple workflow (no form needed)
         function redirectToSimpleWorkflow() {
+            console.log('🔥 redirectToSimpleWorkflow called');
+            alert('🔥 redirectToSimpleWorkflow called');
+            
             const pattern = WORKFLOW_PATTERNS['simple'];
+            console.log('📋 Pattern:', pattern);
+            
             const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${pattern.workflow}`;
+            console.log('🔗 Dispatch URL:', dispatchUrl);
+            alert('🔗 Will redirect to: ' + dispatchUrl);
             
             showMessage('success', `
                 🚀 Redirecting to Simple Workflow!<br><br>
@@ -821,6 +828,8 @@
             `);
             
             setTimeout(() => {
+                console.log('⏰ Timeout fired, opening window');
+                alert('⏰ About to open: ' + dispatchUrl);
                 window.open(dispatchUrl, '_blank');
             }, 1500);
         }
