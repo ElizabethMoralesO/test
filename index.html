@@ -16,15 +16,27 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
+            background: #ffffff;
             padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            border: 1px solid #d1d9e0;
         }
         h1 {
-            color: #0969da;
+            color: #fb8500;
             text-align: center;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        h1::before {
+            content: "";
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="%23000000"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>') no-repeat;
+            background-size: contain;
         }
         .subtitle {
             text-align: center;
@@ -38,21 +50,42 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 600;
+            color: #24292f;
         }
         input[type="text"], select, textarea {
             width: 100%;
             padding: 8px 12px;
-            border: 1px solid #d0d7de;
+            border: 1px solid #d1d9e0;
             border-radius: 6px;
             font-size: 14px;
             box-sizing: border-box;
+            background-color: #ffffff;
+            color: #24292f;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+            border-color: #fb8500;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(251, 133, 0, 0.3);
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d9e0;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            color: #24292f;
+        }
+        input[type="checkbox"] {
+            accent-color: #fb8500;
         }
         textarea {
             resize: vertical;
             min-height: 80px;
         }
         .btn {
-            background-color: #2da44e;
+            background-color: #fb8500;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -63,12 +96,16 @@
             transition: background-color 0.2s;
             width: 100%;
             margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .btn:hover {
-            background-color: #2c974b;
+            background-color: #e07600;
         }
         .btn:disabled {
-            background-color: #94d3a2;
+            background-color: #484f58;
             cursor: not-allowed;
         }
         .status {
@@ -78,18 +115,18 @@
             display: none;
         }
         .status.success {
-            background-color: #dafbe1;
-            color: #0969da;
-            border: 1px solid #2da44e;
+            background-color: #fff3e0;
+            color: #cc6600;
+            border: 1px solid #fb8500;
         }
         .status.error {
             background-color: #ffebe9;
             color: #cf222e;
-            border: 1px solid #ff818266;
+            border: 1px solid #da3633;
         }
         .info-box {
-            background-color: #ddf4ff;
-            border: 1px solid #54aeff66;
+            background-color: #f6f8fa;
+            border: 1px solid #fb8500;
             border-radius: 6px;
             padding: 16px;
             margin-bottom: 30px;
@@ -100,7 +137,7 @@
             text-align: center;
         }
         .links a {
-            color: #0969da;
+            color: #fb8500;
             text-decoration: none;
             margin: 0 10px;
         }
@@ -110,9 +147,9 @@
         
         /* Copy button styling */
         #copyJsonBtn:hover {
-            background: #0860ca !important;
+            background: #e07600 !important;
             transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
         
         #copyJsonBtn:active {
@@ -126,50 +163,42 @@
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Workflows</h1>
-        <p class="subtitle">Trigger GitHub Actions workflows from your browser</p>
+        <h1 style="color: #000000;">
+            GitHub Actions Workflows
+        </h1>
+        <p class="subtitle">Trigger GitHub Actions from your browser</p>
         
         <!-- Workflow Pattern Selector -->
         <div class="workflow-selector" style="margin-bottom: 30px;">
-            <h3 style="color: #07284f; margin-bottom: 15px;">🎯 Select workflow to run</h3>
+            <h3 style="color: #da3005; margin-bottom: 15px;">
+                Select GitHub Action to run:
+            </h3>
             
             <div class="pattern-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px;">
                 
                 <!-- Advanced JSON Pattern -->
-                <div class="pattern-card" data-pattern="advanced" style="border: 2px solid #d0d7de; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;">
-                    <h4 style="margin: 0 0 8px 0; color: #0969da;">🔧 Advanced JSON Configuration</h4>
+                <div class="pattern-card" data-pattern="advanced" style="border: 2px solid #d1d9e0; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s; background-color: #f6f8fa;">
+                    <h4 style="margin: 0 0 8px 0; color: #fb8500; display: flex; align-items: center; gap: 6px;">
+                        Advanced JSON Configuration
+                    </h4>
                     <p style="margin: 0 0 8px 0; font-size: 14px; color: #656d76;">15+ inputs via JSON payload. Ideal for complex deployments.</p>
-                    <div style="font-size: 12px; color: #0969da;">
+                    <div style="font-size: 12px; color: #cc6414;">
                         <strong>Use cases:</strong> Multi-cloud deployments, complex CI/CD, enterprise configs
                     </div>
                 </div>
 
                 <!-- Simple Trigger Pattern -->
-                <div class="pattern-card" data-pattern="simple" style="border: 2px solid #d0d7de; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;">
-                    <h4 style="margin: 0 0 8px 0; color: #0969da;">⚡ Simple Workflow Trigger</h4>
+                <div class="pattern-card" data-pattern="simple" style="border: 2px solid #d1d9e0; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s; background-color: #f6f8fa;">
+                    <h4 style="margin: 0 0 8px 0; color: #fb8500; display: flex; align-items: center; gap: 6px;">
+                        Simple Workflow Trigger
+                    </h4>
                     <p style="margin: 0 0 8px 0; font-size: 14px; color: #656d76;">Basic workflow with message and environment selection.</p>
-                    <div style="font-size: 12px; color: #0969da;">
+                    <div style="font-size: 12px; color: #cc6414;">
                         <strong>Use cases:</strong> Quick deployments, testing, demos, simple automation
                     </div>
                 </div>
 
-                <!-- Multi-Environment Pattern -->
-                <div class="pattern-card" data-pattern="multi-env" style="border: 2px solid #d0d7de; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;">
-                    <h4 style="margin: 0 0 8px 0; color: #0969da;">🌍 Multi-Environment Pipeline</h4>
-                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #656d76;">Deploy across multiple environments with approval gates.</p>
-                    <div style="font-size: 12px; color: #0969da;">
-                        <strong>Use cases:</strong> Progressive deployments, staging pipelines, release management
-                    </div>
-                </div>
 
-                <!-- API Integration Pattern -->
-                <div class="pattern-card" data-pattern="api-integration" style="border: 2px solid #d0d7de; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;">
-                    <h4 style="margin: 0 0 8px 0; color: #0969da;">🔗 API Integration Workflow</h4>
-                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #656d76;">Fetch data from external APIs and trigger based on results.</p>
-                    <div style="font-size: 12px; color: #0969da;">
-                        <strong>Use cases:</strong> Nexus artifacts, Docker registry, infrastructure APIs
-                    </div>
-                </div>
                 
             </div>
             
@@ -177,11 +206,13 @@
 
         <!-- Advanced Configuration Form (11+ Inputs) -->
         <form id="triggerForm">
-            <h3>🎯 Advanced Workflow Configuration</h3>
+            <h3>Advanced Workflow Configuration</h3>
             
             <!-- Deployment Configuration -->
             <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d0d7de; border-radius: 6px;">
-                <legend style="font-weight: bold; color: #0969da;">🚀 Deployment Settings</legend>
+                <legend style="font-weight: bold; color: #fb8500; display: flex; align-items: center; gap: 6px;">
+                    Deployment Settings
+                </legend>
                 
                 <div class="form-group">
                     <label for="environment">Target Environment:</label>
@@ -216,8 +247,10 @@
             </fieldset>
 
             <!-- Application Configuration -->
-            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d0d7de; border-radius: 6px;">
-                <legend style="font-weight: bold; color: #0969da;">⚙️ Application Settings</legend>
+            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d1d9e0; border-radius: 6px; background-color: #f6f8fa;">
+                <legend style="font-weight: bold; color: #fb8500; display: flex; align-items: center; gap: 6px;">
+                    Application Settings
+                </legend>
                 
                 <div class="form-group">
                     <label for="appName">Application Name:</label>
@@ -246,8 +279,10 @@
             </fieldset>
 
             <!-- Database Configuration -->
-            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d0d7de; border-radius: 6px;">
-                <legend style="font-weight: bold; color: #0969da;">🗄️ Database Settings</legend>
+            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d1d9e0; border-radius: 6px; background-color: #f6f8fa;">
+                <legend style="font-weight: bold; color: #fb8500; display: flex; align-items: center; gap: 6px;">
+                    Database Settings
+                </legend>
                 
                 <div class="form-group">
                     <label for="dbType">Database Type:</label>
@@ -276,8 +311,10 @@
             </fieldset>
 
             <!-- Advanced Options -->
-            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d0d7de; border-radius: 6px;">
-                <legend style="font-weight: bold; color: #0969da;">🔧 Advanced Options</legend>
+            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #d1d9e0; border-radius: 6px; background-color: #f6f8fa;">
+                <legend style="font-weight: bold; color: #fb8500; display: flex; align-items: center; gap: 6px;">
+                    Advanced Options
+                </legend>
                 
                 <div class="form-group">
                     <label for="enableLogging">
@@ -305,16 +342,18 @@
             </fieldset>
 
             <!-- Generated JSON Preview -->
-            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #f0c040; border-radius: 6px; background-color: #fff8dc;">
-                <legend style="font-weight: bold; color: #b8860b;">📋 Generated Configuration JSON</legend>
+            <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #ff6e30; border-radius: 6px; background-color: #f6f8fa;">
+                <legend style="font-weight: bold; color: #fb5800; display: flex; align-items: center; gap: 6px;">
+                    Generated Configuration JSON
+                </legend>
                 <div style="position: relative;">
-                    <pre id="jsonPreview" style="background: #f6f8fa; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; max-height: 200px; margin: 0;">{
+                    <pre id="jsonPreview" style="background: #f6f8fa; color: #24292f; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; max-height: 200px; margin: 0; border: 1px solid #d1d9e0;">{
   "deployment": {},
   "application": {},
   "database": {},
   "advanced": {}
 }</pre>
-                    <button id="copyJsonBtn" onclick="copyJsonToClipboard()" style="position: absolute; top: 8px; right: 8px; background: #0969da; color: white; border: none; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px;" title="Copy JSON to clipboard">
+                    <button id="copyJsonBtn" onclick="copyJsonToClipboard()" style="position: absolute; top: 8px; right: 8px; background: #e0430a; color: white; border: none; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px;" title="Copy JSON to clipboard">
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
                             <path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
                             <path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
@@ -325,7 +364,10 @@
             </fieldset>
 
             <button type="submit" class="btn" id="triggerBtn">
-                🎯 Generate JSON & Trigger Advanced Workflow
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="#000000">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                Generate JSON & Trigger GitHub Action
             </button>
         </form>
 
@@ -394,20 +436,6 @@
                 description: 'Basic workflow trigger with message and environment selection',
                 inputCount: 2,
                 useForm: false
-            },
-            'multi-env': {
-                name: 'Multi-Environment Pipeline',
-                workflow: 'multi-env-workflow.yaml',
-                description: 'Progressive deployment across multiple environments with approval gates',
-                inputCount: 5,
-                useForm: true
-            },
-            'api-integration': {
-                name: 'API Integration Workflow',
-                workflow: 'api-integration-workflow.yaml',
-                description: 'Fetch external data and trigger workflows based on API responses',
-                inputCount: 5,
-                useForm: true
             }
         };
         
@@ -448,11 +476,11 @@
             // Update visual selection
             document.querySelectorAll('.pattern-card').forEach(card => {
                 if (card.dataset.pattern === patternId) {
-                    card.style.border = '2px solid #2da44e';
-                    card.style.backgroundColor = '#dafbe1';
+                    card.style.border = '2px solid #fb8500';
+                    card.style.backgroundColor = '#fff3e0';
                 } else {
-                    card.style.border = '2px solid #d0d7de';
-                    card.style.backgroundColor = 'white';
+                    card.style.border = '2px solid #d1d9e0';
+                    card.style.backgroundColor = '#f6f8fa';
                 }
             });
             
@@ -471,10 +499,6 @@
                 
                 if (patternId === 'advanced') {
                     showAdvancedForm();
-                } else if (patternId === 'multi-env') {
-                    showMultiEnvForm();
-                } else if (patternId === 'api-integration') {
-                    showApiIntegrationForm();
                 }
             } else {
                 formContainer.style.display = 'none';
@@ -571,89 +595,7 @@
             `;
         }
 
-        function showMultiEnvForm() {
-            const formContainer = document.getElementById('triggerForm');
-            formContainer.innerHTML = `
-                <h3>🌍 Multi-Environment Pipeline</h3>
-                <div class="form-group">
-                    <label for="release-version">Release Version:</label>
-                    <input type="text" id="release-version" placeholder="v1.0.0" required>
-                </div>
-                <div class="form-group">
-                    <label for="source-environment">Source Environment:</label>
-                    <select id="source-environment" required>
-                        <option value="development">Development</option>
-                        <option value="staging">Staging</option>
-                        <option value="production">Production</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="target-environments">Target Environments:</label>
-                    <div style="margin: 8px 0;">
-                        <label><input type="checkbox" value="qa" style="width: auto; margin-right: 8px;"> QA Environment</label><br>
-                        <label><input type="checkbox" value="staging" style="width: auto; margin-right: 8px;"> Staging Environment</label><br>
-                        <label><input type="checkbox" value="production" style="width: auto; margin-right: 8px;"> Production Environment</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="approval-required">
-                        <input type="checkbox" id="approval-required" style="width: auto; margin-right: 8px;">
-                        Require Manual Approval for Production
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label for="rollback-strategy">Rollback Strategy:</label>
-                    <select id="rollback-strategy">
-                        <option value="automatic">Automatic on Failure</option>
-                        <option value="manual">Manual Only</option>
-                        <option value="none">No Rollback</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn" id="triggerBtn">
-                    🌍 Start Multi-Environment Pipeline
-                </button>
-            `;
-        }
 
-        function showApiIntegrationForm() {
-            const formContainer = document.getElementById('triggerForm');
-            formContainer.innerHTML = `
-                <h3>🔗 API Integration Workflow</h3>
-                <div class="form-group">
-                    <label for="api-source">API Source:</label>
-                    <select id="api-source" required>
-                        <option value="nexus">Nexus Repository</option>
-                        <option value="docker-hub">Docker Hub</option>
-                        <option value="github-releases">GitHub Releases</option>
-                        <option value="custom-api">Custom API</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="api-endpoint">API Endpoint:</label>
-                    <input type="text" id="api-endpoint" placeholder="https://api.example.com/artifacts" required>
-                </div>
-                <div class="form-group">
-                    <label for="filter-criteria">Filter Criteria:</label>
-                    <input type="text" id="filter-criteria" placeholder="latest, stable, v1.*">
-                </div>
-                <div class="form-group">
-                    <label for="action-on-result">Action on API Result:</label>
-                    <select id="action-on-result" required>
-                        <option value="deploy-latest">Deploy Latest Version</option>
-                        <option value="compare-versions">Compare with Current</option>
-                        <option value="notify-only">Notification Only</option>
-                        <option value="conditional-deploy">Conditional Deployment</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="webhook-url">Notification Webhook (Optional):</label>
-                    <input type="url" id="webhook-url" placeholder="https://hooks.slack.com/...">
-                </div>
-                <button type="submit" class="btn" id="triggerBtn">
-                    🔗 Start API Integration Workflow
-                </button>
-            `;
-        }
 
         // Update display based on selected pattern
         function updateDisplay() {
@@ -693,15 +635,6 @@
                 const environment = document.getElementById('simple-environment').value;
                 redirectToSimpleWorkflowWithParams(message, environment, pattern.workflow);
                 
-            } else if (selectedPattern === 'multi-env') {
-                triggerBtn.textContent = '🔄 Starting pipeline...';
-                const config = collectMultiEnvData();
-                redirectToMultiEnvWorkflow(config, pattern.workflow);
-                
-            } else if (selectedPattern === 'api-integration') {
-                triggerBtn.textContent = '🔄 Configuring API integration...';
-                const config = collectApiIntegrationData();
-                redirectToApiIntegrationWorkflow(config, pattern.workflow);
             }
             
             // Re-enable button after delay
@@ -747,11 +680,11 @@
                 </small>
             `);
             
-            // Copy JSON to clipboard for easy pasting
+            // Copy to clipboard for easy pasting
             navigator.clipboard.writeText(jsonPayload).then(() => {
                 // Update button text temporarily to show copy success
                 triggerBtn.textContent = '📋 JSON Copied! Opening GitHub...';
-                triggerBtn.style.background = '#2da44e';
+                triggerBtn.style.background = '#fb8500';
             }).catch(err => {
                 // Fallback copy method
                 const textArea = document.createElement('textarea');
@@ -762,7 +695,7 @@
                 document.body.removeChild(textArea);
                 
                 triggerBtn.textContent = '📋 JSON Copied! Opening GitHub...';
-                triggerBtn.style.background = '#2da44e';
+                triggerBtn.style.background = '#FF6200';
             });
             
             // Auto-open GitHub Actions page
@@ -771,32 +704,7 @@
             }, 3000);
         }
 
-        // Collect data for multi-environment workflow
-        function collectMultiEnvData() {
-            const targets = [];
-            document.querySelectorAll('input[type="checkbox"][value]').forEach(cb => {
-                if (cb.checked) targets.push(cb.value);
-            });
-            
-            return {
-                release_version: document.getElementById('release-version').value,
-                source_environment: document.getElementById('source-environment').value,
-                target_environments: targets.join(','),
-                approval_required: document.getElementById('approval-required').checked,
-                rollback_strategy: document.getElementById('rollback-strategy').value
-            };
-        }
 
-        // Collect data for API integration workflow
-        function collectApiIntegrationData() {
-            return {
-                api_source: document.getElementById('api-source').value,
-                api_endpoint: document.getElementById('api-endpoint').value,
-                filter_criteria: document.getElementById('filter-criteria').value || 'latest',
-                action_on_result: document.getElementById('action-on-result').value,
-                webhook_url: document.getElementById('webhook-url').value || ''
-            };
-        }
 
         // Generic redirect to workflow
         function redirectToWorkflow(patternId) {
@@ -824,9 +732,9 @@
             const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${pattern.workflow}`;
             
             showMessage('success', `
-                🚀 <strong>Redirecting to Simple Workflow!</strong>
-                <a href="${dispatchUrl}" target="_blank" class="btn" style="color: white; text-decoration: none; display: inline-block; margin: 10px 0;">
-                    ⚡ Open Simple Workflow in GitHub Actions
+                🚀 <strong>Redirecting to Simple Workflow!</strong><br><br>
+                <a href="${dispatchUrl}" target="_blank" style="background: #fb8500; color: white; text-decoration: none; display: inline-block; padding: 8px 16px; border-radius: 6px; font-size: 14px; margin: 8px 0;">
+                    ⚡ Open Simple Workflow
                 </a><br>
                 <small>You can also wait 3 seconds for automatic redirect...</small>
             `);
@@ -854,42 +762,7 @@
             }, 2000);
         }
 
-        // Redirect to multi-environment workflow
-        function redirectToMultiEnvWorkflow(config, workflowFile) {
-            const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${workflowFile}`;
-            
-            showMessage('success', `
-                ✅ Multi-environment pipeline configured!<br><br>
-                <strong>Configuration:</strong><br>
-                • Release: ${config.release_version}<br>
-                • From: ${config.source_environment}<br>
-                • To: ${config.target_environments || 'None selected'}<br>
-                • Approval Required: ${config.approval_required ? 'Yes' : 'No'}<br><br>
-                You'll be redirected to GitHub Actions...
-            `);
-            
-            setTimeout(() => {
-                window.open(dispatchUrl, '_blank');
-            }, 2000);
-        }
 
-        // Redirect to API integration workflow
-        function redirectToApiIntegrationWorkflow(config, workflowFile) {
-            const dispatchUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${workflowFile}`;
-            
-            showMessage('success', `
-                ✅ API integration workflow configured!<br><br>
-                <strong>Configuration:</strong><br>
-                • API Source: ${config.api_source}<br>
-                • Endpoint: ${config.api_endpoint}<br>
-                • Action: ${config.action_on_result}<br><br>
-                You'll be redirected to GitHub Actions...
-            `);
-            
-            setTimeout(() => {
-                window.open(dispatchUrl, '_blank');
-            }, 2000);
-        }
 
         // Utility functions
         function showMessage(type, message) {
@@ -927,7 +800,7 @@
                 // Reset after 2 seconds
                 setTimeout(() => {
                     copyBtn.innerHTML = originalText;
-                    copyBtn.style.background = '#0969da';
+                    copyBtn.style.background = '#fb8500';
                 }, 2000);
             }).catch(err => {
                 // Fallback for older browsers
@@ -949,7 +822,7 @@
                 
                 setTimeout(() => {
                     copyBtn.innerHTML = originalText;
-                    copyBtn.style.background = '#0969da';
+                    copyBtn.style.background = '#FF6200';
                 }, 2000);
             });
         }
