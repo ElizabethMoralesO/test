@@ -1,0 +1,130 @@
+name: Deploy - Consume Artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_workflow:
+        description: 'Source workflow'
+        required: true
+        type: choice
+        options:
+          - 'Build and Upload Artifact'
+      download_mode:
+        description: 'Download by run ID or latest from branch'
+        required: true
+        type: choice
+        default: 'run_id'
+        options:
+          - 'run_id'
+          - 'branch'
+      run_id:
+        description: 'Run ID to download artifact from (used when mode = run_id)'
+        required: false
+        type: string
+      branch:
+        description: 'Branch name to get latest successful run from (used when mode = branch)'
+        required: false
+        type: string
+        default: 'main'
+
+env:
+  ARTIFACT_NAME: 'my-artifact'
+
+jobs:
+  consume-artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate inputs
+        run: |
+          if [ "${{ inputs.download_mode }}" == "run_id" ] && [ -z "${{ inputs.run_id }}" ]; then
+            echo "::error::run_id is required when download_mode is 'run_id'"
+            exit 1
+          fi
+          if [ "${{ inputs.download_mode }}" == "branch" ] && [ -z "${{ inputs.branch }}" ]; then
+            echo "::error::branch is required when download_mode is 'branch'"
+            exit 1
+          fi
+
+      # Map workflow display name → filename
+      - name: Resolve workflow filename from display name
+        id: map
+        run: |
+          case "${{ inputs.source_workflow }}" in
+            "Build and Upload Artifact")
+              WORKFLOW_FILE="artifact-producer.yml" ;;
+            *)
+              echo "::error::Unknown workflow name: '${{ inputs.source_workflow }}'"
+              exit 1 ;;
+          esac
+          echo "Resolved filename: $WORKFLOW_FILE"
+          echo "workflow_file=$WORKFLOW_FILE" >> $GITHUB_OUTPUT
+
+      # When mode=branch: resolve the latest successful run ID on that branch
+      - name: Resolve latest run ID from branch
+        if: inputs.download_mode == 'branch'
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Looking for latest successful run of '${{ steps.map.outputs.workflow_file }}' on branch '${{ inputs.branch }}'..."
+
+          RESOLVED_ID=$(gh run list \
+            --repo ${{ github.repository }} \
+            --workflow="${{ steps.map.outputs.workflow_file }}" \
+            --branch="${{ inputs.branch }}" \
+            --status=success \
+            --limit=1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          if [ -z "$RESOLVED_ID" ] || [ "$RESOLVED_ID" == "null" ]; then
+            echo "::error::No successful run found for '${{ inputs.source_workflow }}' on branch '${{ inputs.branch }}'"
+            exit 1
+          fi
+
+          echo "Resolved Run ID: $RESOLVED_ID"
+          echo "resolved_run_id=$RESOLVED_ID" >> $GITHUB_OUTPUT
+
+      # Determine the effective run ID to use downstream
+      - name: Set effective run ID
+        id: effective
+        run: |
+          if [ "${{ inputs.download_mode }}" == "branch" ]; then
+            echo "run_id=${{ steps.resolve.outputs.resolved_run_id }}" >> $GITHUB_OUTPUT
+          else
+            echo "run_id=${{ inputs.run_id }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Summary
+        run: |
+          echo "### Artifact Download Info" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Source Workflow | ${{ inputs.source_workflow }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Workflow File | ${{ steps.map.outputs.workflow_file }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Download Mode | ${{ inputs.download_mode }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ inputs.branch }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Effective Run ID | ${{ steps.effective.outputs.run_id }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact Name | ${{ env.ARTIFACT_NAME }} |" >> $GITHUB_STEP_SUMMARY
+
+      # Download the artifact using the resolved or provided run ID
+      - name: Download artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: ${{ steps.map.outputs.workflow_file }}
+          run_id: ${{ steps.effective.outputs.run_id }}
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ./downloaded-artifacts
+
+      - name: List downloaded artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          find ./downloaded-artifacts -type f
+
+      - name: Display artifact content
+        run: cat ./downloaded-artifacts/artifact.txt || echo "File not found"
+
+      - name: Deploy
+        run: |
+          echo "Deploying artifact from run ${{ steps.effective.outputs.run_id }}..."
+          # Add your deployment logic here
