@@ -25,7 +25,6 @@ on:
         description: 'Branch name to get latest successful run from (used when mode = branch)'
         required: false
         type: string
-        default: 'main'
 
 env:
   ARTIFACT_NAME: 'my-artifact'
